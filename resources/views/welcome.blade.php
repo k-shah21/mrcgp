@@ -1049,7 +1049,7 @@
                                                 </label>
                                             </div>
                                         </div>
-                                        <div class="space-y-4" data-doc="experience">
+                                        <div class="space-y-2" data-doc="experience">
                                             <div class="flex items-center justify-between"><label
                                                     class="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-sm font-medium">Experience
                                                     Certificate(s) <span class="text-red-500">*</span></label><span
@@ -1398,93 +1398,245 @@
         // FILE NAME DISPLAY & IMAGE PREVIEWS
         // =============================================
         function initFileNameDisplay() {
-            const fileInputs = document.querySelectorAll('input[type="file"]');
-            fileInputs.forEach(input => {
-                input.addEventListener('change', function() {
-                    clearErrorForField(this);
-                    const label = this.closest('label');
-                    // Find the div containing the upload SVG and text
-                    let uploadContent = label ? (label.querySelector('.pt-5') || label.querySelector('.flex-col')) : null;
-                    if (!uploadContent && label) {
-                        // Fallback: look in the parent container
-                        const container = this.closest('.space-y-2, [data-doc]');
-                        if (container) uploadContent = container.querySelector('.pt-5') || container.querySelector('.flex-col');
-                    }
-                    
-                    // Remove existing badge/preview
-                                                                                const existingBadge = this.closest('.space-y-2, label, [data-doc]')?.querySelector('.file-name-badge');
-                    if (existingBadge) existingBadge.remove();
-                    const existingPreview = label ? label.querySelector('.image-preview-container') : null;
-                    if (existingPreview) existingPreview.remove();
+            // Use event delegation for all file inputs
+            document.body.addEventListener('change', function(e) {
+                const input = e.target;
+                if (input.tagName !== 'INPUT' || input.type !== 'file') return;
 
-                    if (this.files && this.files.length > 0) {
-                        const file = this.files[0];
-                        const isImage = file.type.startsWith('image/');
-                        const names = Array.from(this.files).map(f => f.name);
+                // Immediately clear errors for this specific field
+                clearErrorForField(input);
+                
+                const uploadLabel = input.closest('label'); // The dashed box
+                // We want to place the preview/badge inside the container that holds the label
+                // Parent is usually the center-aligned div. Use parent directly to avoid matching the label itself if it has similar classes.
+                const visualContainer = uploadLabel ? uploadLabel.parentElement : input.parentElement;
+                
+                if (!visualContainer) return;
 
-                        if (isImage && label && uploadContent) {
-                            // Hide the upload prompt, show the preview inside the label
-                            uploadContent.classList.add('hidden');
-                            label.classList.remove('h-32');
-                            label.classList.add('py-4');
-                            
-                            const reader = new FileReader();
-                            reader.onload = (e) => {
-                                const previewContainer = document.createElement('div');
-                                previewContainer.className = 'image-preview-container flex flex-col items-center justify-center w-full px-4';
-                                previewContainer.innerHTML = `
-                                    <img src="${e.target.result}" class="max-h-48 object-contain rounded-md shadow-sm border border-slate-200 bg-white" alt="Preview" />
-                                    <div class="mt-3 px-4 py-1.5 bg-white border border-slate-200 rounded-md text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 transition-colors pointer-events-none">
-                                        Change Image
+                // Remove any existing previews or badges in this container
+                visualContainer.querySelectorAll('.relative.w-full, .file-name-badge').forEach(el => el.remove());
+
+                if (input.files && input.files.length > 0) {
+                    const file = input.files[0];
+                    const isImage = file.type.startsWith('image/');
+
+                    if (isImage) {
+                        // Hide the dashed label box
+                        if (uploadLabel) uploadLabel.classList.add('hidden');
+
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            // Clear again to prevent duplicates if user clicks fast
+                            visualContainer.querySelectorAll('.relative.w-full, .file-name-badge').forEach(el => el.remove());
+
+                            const previewHtml = `
+                                <div class="relative w-full">
+                                    <div class="flex flex-col items-center">
+                                        <img src="${event.target.result}" alt="Preview" class="h-40 object-contain rounded-md mb-2 border border-slate-200 bg-white shadow-sm">
+                                        <button class="change-img-btn inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border shadow-sm hover:bg-accent hover:text-accent-foreground h-8 rounded-md px-3 text-xs bg-slate-50" 
+                                                type="button">
+                                            Change Image
+                                        </button>
                                     </div>
-                                `;
-                                input.before(previewContainer);
-                            };
-                            reader.readAsDataURL(file);
-                        } else {
-                            // Non-image file (e.g., PDF) or no label container
-                            if (uploadContent) {
-                                uploadContent.classList.remove('hidden');
-                                label.classList.add('h-32');
-                                label.classList.remove('py-4');
-                            }
-                            
-                            const badge = document.createElement('div');
-                            badge.className = 'file-name-badge mt-2 w-full flex items-center justify-center';
-                            badge.innerHTML = `<div class="w-full px-3 py-2 bg-indigo-50 border border-indigo-100 rounded-md flex items-center justify-center gap-2 text-indigo-700 text-sm"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" class="shrink-0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg><span class="truncate max-w-[200px]">${names.join(', ')}</span></div>`;
-                            
-                            const container = this.closest('[data-doc]') || this.closest('.space-y-2');
-                            if (container) {
-                                container.appendChild(badge);
-                            } else {
-         this.parentElement.after(badge);
-                            }   
+                                </div>
+                            `;
+                            visualContainer.insertAdjacentHTML('beforeend', previewHtml);
 
-                            if (uploadContent) {
-                                const uploadText = uploadContent.querySelector('.font-semibold');
-                                if (uploadText && uploadText.textContent.includes('Click')) {
-                                    uploadText.textContent = '✓ File selected';
-                                    uploadText.closest('p').classList.remove('text-slate-500');
-                                    uploadText.closest('p').classList.add('text-indigo-600');
-                                           }
+                            // Setup Change Image button
+                            const changeBtn = visualContainer.querySelector('.change-img-btn');
+                            if (changeBtn) {
+                                changeBtn.onclick = function(ev) {
+                                    ev.preventDefault();
+                                    input.click();
+                                };
+                            }
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        // For non-images (PDF), show the checkbox style
+                        if (uploadLabel) {
+                            uploadLabel.classList.remove('hidden');
+                            const uploadText = uploadLabel.querySelector('.font-semibold');
+                            if (uploadText) {
+                                uploadText.textContent = '✓ File selected';
+                                uploadText.closest('p')?.classList.add('text-indigo-600');
+                                uploadText.closest('p')?.classList.remove('text-slate-500');
                             }
                         }
-                    } else {
-             // Cleared state
-                        if (uploadContent) {
-                            uploadContent.classList.remove('hidden');
-                            label.classList.add('h-32');
-                            label.classList.remove('py-4');
-                            const uploadText = uploadContent.querySelector('.font-semibold');
-                            if (uploadText && uploadText.textContent.includes('✓')) {
-                                uploadText.textContent = 'Click to upload';
-                                uploadText.closest('p').classList.remove('text-indigo-600');
-                                uploadText.closest('p').classList.add('text-slate-500');
-                            }
+                        const badge = document.createElement('div');
+                        badge.className = 'file-name-badge mt-2 w-full flex items-center justify-center';
+                        badge.innerHTML = `<div class="w-full px-3 py-2 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800 rounded-md flex items-center justify-center gap-2 text-indigo-700 dark:text-indigo-400 text-sm italic font-medium"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" class="shrink-0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg><span class="truncate max-w-[200px]">${file.name}</span></div>`;
+                        visualContainer.appendChild(badge);
+                    }
+                } else {
+                    // Cleared state - restore prompt
+                    if (uploadLabel) {
+                        uploadLabel.classList.remove('hidden');
+                        const uploadText = uploadLabel.querySelector('.font-semibold');
+                        if (uploadText) {
+                            uploadText.textContent = 'Click to upload';
+                            uploadText.closest('p')?.classList.add('text-slate-500');
+                            uploadText.closest('p')?.classList.remove('text-indigo-600');
                         }
                     }
-                });
+                }
             });
+        }
+        // =============================================
+        // GLOBAL CONSTANTS & HELPERS
+        // =============================================
+        const radioCheckedSVG = '<span data-state="checked" class="flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle h-2.5 w-2.5 fill-indigo-600 text-indigo-600"><circle cx="12" cy="12" r="10"></circle></svg></span>';
+        const checkboxCheckedSVG = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check h-4 w-4 text-white"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+        
+        // Track current candidate type globally
+        let currentCandidateType = 'new'; 
+
+        function handleCandidateTypeChange(type, sourceEl) {
+            currentCandidateType = type;
+            const isOld = type === 'old';
+            const candidateIdContainer = document.getElementById('candidate-id-container');
+            const candidateTypeRadios = document.querySelectorAll('button[role="radio"][value="new"], button[role="radio"][value="old"]');
+            const wrapper = sourceEl ? sourceEl.closest('.cand-type-wrapper') : null;
+
+            if (isOld) {
+                if (candidateIdContainer) candidateIdContainer.classList.remove('hidden');
+                const oldInput = document.querySelector('input[name="candidateType"][value="old"]');
+                const newInput = document.querySelector('input[name="candidateType"][value="new"]');
+                if (oldInput) oldInput.disabled = false;
+                if (newInput) newInput.disabled = true;
+            } else {
+                if (candidateIdContainer) candidateIdContainer.classList.add('hidden');
+                const newInput = document.querySelector('input[name="candidateType"][value="new"]');
+                const oldInput = document.querySelector('input[name="candidateType"][value="old"]');
+                if (newInput) newInput.disabled = false;
+                if (oldInput) oldInput.disabled = true;
+                const cidInput = document.getElementById('step1-candidateId');
+                if (cidInput) cidInput.value = '';
+            }
+
+            // Radix emulation for these radios
+            candidateTypeRadios.forEach(btn => {
+                btn.setAttribute('data-state', 'unchecked');
+                btn.setAttribute('aria-checked', 'false');
+                btn.innerHTML = '';
+                const radioWrapper = btn.closest('.cand-type-wrapper');
+                if (radioWrapper) {
+                    radioWrapper.classList.remove('border-indigo-500', 'bg-indigo-50');
+                    radioWrapper.classList.add('border-slate-200', 'bg-slate-50');
+                }
+            });
+
+            const activeRadio = document.getElementById(isOld ? 'radio-old' : 'radio-new');
+            if (activeRadio) {
+                activeRadio.setAttribute('data-state', 'checked');
+                activeRadio.setAttribute('aria-checked', 'true');
+                activeRadio.innerHTML = radioCheckedSVG;
+            }
+
+            if (wrapper) {
+                wrapper.classList.remove('border-slate-200', 'bg-slate-50');
+                wrapper.classList.add('border-indigo-500', 'bg-indigo-50');
+            }
+
+            clearErrorForField('radio-new');
+        }
+
+        function showFieldError(inputEl, message) {
+            let container = inputEl.closest('.space-y-2') || inputEl.closest('.space-y-3') || inputEl.closest('[data-doc]') || inputEl.parentElement;
+            if (!container) return;
+            // Remove existing error
+            container.querySelectorAll('.error-msg').forEach(m => m.remove());
+            
+            // Red border on input or its visual counterpart
+            if (inputEl.type === 'file') {
+                const visualLabel = container.querySelector('label[for="' + inputEl.id + '"]') || inputEl.closest('label');
+                if (visualLabel) {
+                    visualLabel.classList.remove('border-slate-300');
+                    visualLabel.classList.add('border-red-500');
+                }
+            } else if (inputEl.tagName === 'INPUT' || inputEl.tagName === 'SELECT') {
+                inputEl.classList.remove('border-slate-200', 'focus-visible:ring-indigo-500');
+                inputEl.classList.add('border-red-500', 'focus-visible:ring-red-500');
+            } else if (inputEl.id === 'signature-canvas') {
+                inputEl.parentElement.classList.add('border-red-500');
+                inputEl.parentElement.classList.remove('border-slate-200');
+            }
+
+            // Red label
+            const label = container.querySelector('label:not([for="' + inputEl.id + '"])') || container.querySelector('label');
+            if (label) label.classList.add('text-red-500');
+            
+            // Error message
+            const errorP = document.createElement('p');
+            errorP.className = 'error-msg text-sm text-red-500 mt-1 font-medium transition-all duration-200';
+            errorP.innerText = message;
+            container.appendChild(errorP);
+        }
+
+        function clearErrorForField(inputId) {
+            const el = typeof inputId === 'string' ? document.getElementById(inputId) : inputId;
+            if (!el) return;
+            
+            // Find all potential container boundaries
+            const container = el.closest('.space-y-6') || el.closest('.space-y-4') || el.closest('.space-y-2') || el.closest('[data-doc]') || el.parentElement;
+            
+            if (container) {
+                // Remove all error messages in this container
+                container.querySelectorAll('.error-msg').forEach(msg => msg.remove());
+                // Remove red text from all labels in this container
+                container.querySelectorAll('label.text-red-500').forEach(l => l.classList.remove('text-red-500'));
+                
+                if (el.type === 'file') {
+                    // Find the visual upload label (dashed box)
+                    const visualLabel = container.querySelector('label[for="' + el.id + '"]') || el.closest('label');
+                    if (visualLabel) {
+                        visualLabel.classList.remove('border-red-500', 'ring-red-500', 'ring-1');
+                        visualLabel.classList.add('border-slate-300');
+                    }
+                } else if (el.id === 'signature-canvas') {
+                    el.parentElement.classList.remove('border-red-500');
+                    el.parentElement.classList.add('border-slate-200', 'border-slate-300');
+                }
+            }
+
+            // Standard input visual clear
+            el.classList.remove('border-red-500', 'focus-visible:ring-red-500', 'ring-red-500', 'ring-1');
+            if (el.tagName === 'INPUT' || el.tagName === 'SELECT') {
+                if (el.type !== 'file') {
+                    el.classList.add('border-slate-200', 'focus-visible:ring-indigo-500');
+                }
+            }
+        }
+
+        function clearAllErrors(scope) {
+            const root = scope || document;
+            root.querySelectorAll('.error-msg').forEach(el => el.remove());
+            root.querySelectorAll('.border-red-500').forEach(el => {
+                el.classList.remove('border-red-500', 'focus-visible:ring-red-500');
+                if (el.tagName !== 'BUTTON') el.classList.add('border-slate-200', 'focus-visible:ring-indigo-500');
+            });
+            root.querySelectorAll('label.text-red-500').forEach(el => el.classList.remove('text-red-500'));
+        }
+
+        function showInlineErrors(errors, scopeEl) {
+            let firstErrorEl = null;
+            Object.keys(errors).forEach(key => {
+                const messages = errors[key];
+                const inputEl = document.querySelector(`[name="${key}"]`) || document.getElementById(key);
+                if (inputEl && (!scopeEl || scopeEl.contains(inputEl))) {
+                    showFieldError(inputEl, messages[0]);
+                    if (!firstErrorEl) firstErrorEl = inputEl;
+                }
+            });
+            if (firstErrorEl) {
+                const container = firstErrorEl.closest('.space-y-2') || firstErrorEl.closest('.space-y-3') || firstErrorEl.closest('[data-doc]') || firstErrorEl.parentElement;
+                if (container) {
+                    container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } else {
+                    firstErrorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                setTimeout(() => { if (firstErrorEl.focus) firstErrorEl.focus(); }, 500);
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -1492,9 +1644,6 @@
             initPhoneInputs();
             // Init file name display
             initFileNameDisplay();
-
-            const radioCheckedSVG = '<span data-state="checked" class="flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle h-2.5 w-2.5 fill-indigo-600 text-indigo-600"><circle cx="12" cy="12" r="10"></circle></svg></span>';
-            const checkboxCheckedSVG = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check h-4 w-4 text-white"><polyline points="20 6 9 17 4 12"></polyline></svg>';
 
             // ==============================
             // Make Radix-style Checkboxes work
@@ -1509,7 +1658,12 @@
                     cb.setAttribute('aria-checked', String(!isChecked));
                     cb.innerHTML = newState === 'checked' ? checkboxCheckedSVG : '';
                     const hiddenInput = cb.nextElementSibling;
-                    if (hiddenInput && hiddenInput.tagName === 'INPUT') hiddenInput.checked = !isChecked;
+                    if (hiddenInput && hiddenInput.tagName === 'INPUT') {
+                        hiddenInput.checked = (newState === 'checked');
+                        // Trigger change event for validation if needed
+                        hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                    clearErrorForField(cb);
                 });
             });
 
@@ -1518,53 +1672,6 @@
             // ==============================
             const candTypeWrappers = document.querySelectorAll('.cand-type-wrapper');
             const candidateTypeRadios = document.querySelectorAll('button[role="radio"][value="new"], button[role="radio"][value="old"]');
-            const candidateIdContainer = document.getElementById('candidate-id-container');
-            const candTypeInputs = document.querySelectorAll('input[name="candidateType"]');
-            let currentCandidateType = 'new'; // track current selection
-
-            function handleCandidateTypeChange(type, sourceEl) {
-                currentCandidateType = type;
-                const isOld = type === 'old';
-                const wrapper = sourceEl.closest('.cand-type-wrapper');
-
-                if (isOld) {
-                    candidateIdContainer.classList.remove('hidden');
-                    document.querySelector('input[name="candidateType"][value="old"]').disabled = false;
-                    document.querySelector('input[name="candidateType"][value="new"]').disabled = true;
-                } else {
-                    candidateIdContainer.classList.add('hidden');
-                    document.querySelector('input[name="candidateType"][value="new"]').disabled = false;
-                    document.querySelector('input[name="candidateType"][value="old"]').disabled = true;
-                    const cidInput = document.getElementById('step1-candidateId');
-                    if (cidInput) cidInput.value = '';
-                }
-
-                // Radix emulation for these radios
-                candidateTypeRadios.forEach(btn => {
-                    btn.setAttribute('data-state', 'unchecked');
-                    btn.setAttribute('aria-checked', 'false');
-                    btn.innerHTML = '';
-                    const radioWrapper = btn.closest('.cand-type-wrapper');
-                    if (radioWrapper) {
-                        radioWrapper.classList.remove('border-indigo-500', 'bg-indigo-50');
-                        radioWrapper.classList.add('border-slate-200', 'bg-slate-50');
-                    }
-                });
-
-                const activeRadio = document.getElementById(isOld ? 'radio-old' : 'radio-new');
-                if (activeRadio) {
-                    activeRadio.setAttribute('data-state', 'checked');
-                    activeRadio.setAttribute('aria-checked', 'true');
-                    activeRadio.innerHTML = radioCheckedSVG;
-                }
-
-                if (wrapper) {
-                    wrapper.classList.remove('border-slate-200', 'bg-slate-50');
-                    wrapper.classList.add('border-indigo-500', 'bg-indigo-50');
-                }
-
-                clearErrorForField('radio-new');
-            }
 
             candTypeWrappers.forEach(wrapper => {
                 wrapper.addEventListener('click', (e) => {
@@ -1586,98 +1693,6 @@
                 newWrapper.classList.remove('border-slate-200', 'bg-slate-50');
                 newWrapper.classList.add('border-indigo-500', 'bg-indigo-50');
             }
-
-            // ===================
-            // Error helpers
-            // ===================
-            function showFieldError(inputEl, message) {
-                let container = inputEl.closest('.space-y-2') || inputEl.closest('.space-y-3') || inputEl.closest('[data-doc]') || inputEl.parentElement;
-                // Remove existing error
-                container.querySelectorAll('.error-msg').forEach(m => m.remove());
-                
-                // Red border on input or its visual counterpart
-                if (inputEl.type === 'file') {
-                    const visualLabel = container.querySelector('label[for="' + inputEl.id + '"]') || inputEl.closest('label');
-                    if (visualLabel) {
-                        visualLabel.classList.remove('border-slate-300');
-                        visualLabel.classList.add('border-red-500');
-                    }
-                } else if (inputEl.tagName === 'INPUT' || inputEl.tagName === 'SELECT') {
-                    inputEl.classList.remove('border-slate-200', 'focus-visible:ring-indigo-500');
-                    inputEl.classList.add('border-red-500', 'focus-visible:ring-red-500');
-                } else if (inputEl.id === 'signature-canvas') {
-                    inputEl.parentElement.classList.add('border-red-500');
-                    inputEl.parentElement.classList.remove('border-slate-200');
-                }
-
-                // Red label
-                const label = container.querySelector('label:not([for="' + inputEl.id + '"])') || container.querySelector('label');
-                if (label) label.classList.add('text-red-500');
-                
-                // Error message
-                const errorP = document.createElement('p');
-                errorP.className = 'error-msg text-sm text-red-500 mt-1 font-medium transition-all duration-200';
-                errorP.innerText = message;
-                container.appendChild(errorP);
-            }
-
-            function clearErrorForField(inputId) {
-                const el = typeof inputId === 'string' ? document.getElementById(inputId) : inputId;
-                if (!el) return;
-                const container = el.closest('.space-y-2') || el.closest('.space-y-3') || el.closest('[data-doc]') || el.closest('.grid') || el.parentElement;
-                if (container) {
-                    container.querySelectorAll('.error-msg').forEach(msg => msg.remove());
-                    container.querySelectorAll('label.text-red-500').forEach(l => l.classList.remove('text-red-500'));
-                    
-                    if (el.type === 'file') {
-                        const visualLabel = container.querySelector('label[for="' + el.id + '"]') || el.closest('label');
-                        if (visualLabel) {
-                            visualLabel.classList.remove('border-red-500');
-                            visualLabel.classList.add('border-slate-300');
-                        }
-                    } else if (el.id === 'signature-canvas') {
-                        el.parentElement.classList.remove('border-red-500');
-                        el.parentElement.classList.add('border-slate-200');
-                    }
-                }
-                el.classList.remove('border-red-500', 'focus-visible:ring-red-500');
-                if (el.tagName === 'INPUT' || el.tagName === 'SELECT') {
-                    if (el.type !== 'file') {
-                        el.classList.add('border-slate-200', 'focus-visible:ring-indigo-500');
-                    }
-                }
-            }
-
-            const clearAllErrors = (scope) => {
-                const root = scope || document;
-                root.querySelectorAll('.error-msg').forEach(el => el.remove());
-                root.querySelectorAll('.border-red-500').forEach(el => {
-                    el.classList.remove('border-red-500', 'focus-visible:ring-red-500');
-                    if (el.tagName !== 'BUTTON') el.classList.add('border-slate-200', 'focus-visible:ring-indigo-500');
-                });
-                root.querySelectorAll('label.text-red-500').forEach(el => el.classList.remove('text-red-500'));
-            };
-
-            const showInlineErrors = (errors, scopeEl) => {
-                let firstErrorEl = null;
-                Object.keys(errors).forEach(key => {
-                    const messages = errors[key];
-                    const inputEl = document.querySelector(`[name="${key}"]`) || document.getElementById(key);
-                    if (inputEl && (!scopeEl || scopeEl.contains(inputEl))) {
-                        showFieldError(inputEl, messages[0]);
-                        if (!firstErrorEl) firstErrorEl = inputEl;
-                    }
-                });
-                if (firstErrorEl) {
-                    const container = firstErrorEl.closest('.space-y-2') || firstErrorEl.closest('.space-y-3') || firstErrorEl.closest('[data-doc]') || firstErrorEl.parentElement;
-                    if (container) {
-                        container.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    } else {
-                        firstErrorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
-                    setTimeout(() => { if (firstErrorEl.focus) firstErrorEl.focus(); }, 500);
-                }
-            };
 
             // ==============================
             // REAL-TIME BLUR VALIDATION
