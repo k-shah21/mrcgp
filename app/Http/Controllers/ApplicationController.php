@@ -1,0 +1,317 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\CheckEligibilityRequest;
+use App\Http\Requests\StoreApplicationRequest;
+use App\Mail\ApplicationReceived;
+use App\Mail\ApplicationRejected;
+use App\Mail\ApplicationStatusChanged;
+use App\Models\Application;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+
+class ApplicationController extends Controller
+{
+    // ─────────────────────────────────────────────
+    // PUBLIC ENDPOINTS
+    // ─────────────────────────────────────────────
+
+    /**
+     * Step 1 – AJAX eligibility / duplicate check.
+     */
+    public function checkEligibility(CheckEligibilityRequest $request): JsonResponse
+    {
+        $type = $request->validated()['candidateType'];
+
+        // ── Old candidate: verify candidateId exists ────────────
+        if ($type === 'old') {
+            $existing = Application::where('candidateId', $request->candidateId)->first();
+
+            if (! $existing) {
+                return response()->json([
+                    'status'  => 'error',
+                    'errors'  => ['candidateId' => ['Candidate ID not found. Please check your ID.']],
+                ], 422);
+            }
+
+            // Passport must match
+            if ($existing->passportNumber !== $request->passportNumber) {
+                return response()->json([
+                    'status'  => 'error',
+                    'errors'  => ['passportNumber' => ['Passport number does not match the candidate record.']],
+                ], 422);
+            }
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Candidate verified. Please proceed to complete your application.',
+                'data'    => [
+                    'usualForename' => $existing->usualForename,
+                    'lastName'      => $existing->lastName,
+                    'email'         => $existing->email,
+                ],
+            ]);
+        }
+
+        // ── New candidate: duplicate check ──────────────────────
+        $emailExists    = Application::where('email', $request->email)->exists();
+        $passportExists = Application::where('passportNumber', $request->passportNumber)->exists();
+
+        if ($emailExists || $passportExists) {
+            $errors = [];
+            if ($emailExists) {
+                $errors['email'] = ['This email address has already been used for an application.'];
+            }
+            if ($passportExists) {
+                $errors['passportNumber'] = ['This passport number has already been used for an application.'];
+            }
+
+            return response()->json([
+                'status'  => 'duplicate',
+                'message' => 'A duplicate application was detected.',
+                'errors'  => $errors,
+            ], 409);
+        }
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Eligibility Confirmed! You can proceed to complete your application.',
+        ]);
+    }
+
+    /**
+     * Step 2 – Final form submission with files.
+     */
+    public function store(StoreApplicationRequest $request): JsonResponse
+    {
+        // Additional race-condition duplicate check before insert
+        $existingQuery = Application::where('passportNumber', $request->passportNumber);
+        if ($request->candidateType === 'new') {
+            $existingQuery->orWhere('email', $request->email);
+        }
+        if ($existingQuery->exists()) {
+            return response()->json([
+                'status'  => 'duplicate',
+                'message' => 'A duplicate application was detected. Submission rejected.',
+            ], 409);
+        }
+
+        $data = $request->except([
+            '_token',
+            'duplicateDisclaimer',
+            'passportImage',
+            'passport_bio_page',
+            'valid_license',
+            'mbbs_degree',
+            'training_certificate',
+            'internship_certificates',
+            'experience_certificates',
+            'signatureUpload',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            // ── File uploads ────────────────────────────────
+            if ($request->hasFile('passportImage')) {
+                $data['passportImagePath'] = $request->file('passportImage')->store('documents/passports', 'public');
+            }
+
+            if ($request->hasFile('passport_bio_page')) {
+                $data['bioDataPagePath'] = $request->file('passport_bio_page')->store('documents/biodata', 'public');
+            }
+
+            if ($request->hasFile('valid_license')) {
+                $data['validLicensePagePath'] = $request->file('valid_license')->store('documents/licenses', 'public');
+            }
+
+            // ── Signature ───────────────────────────────────
+            if ($request->hasFile('signatureUpload')) {
+                $data['signature'] = $request->file('signatureUpload')->store('documents/signatures', 'public');
+            } elseif ($request->filled('signature')) {
+                $data['signature'] = $request->signature; // base64
+            }
+
+            // ── Experience certificates ─────────────────────
+            if ($request->hasFile('experience_certificates')) {
+                $paths = [];
+                foreach ($request->file('experience_certificates') as $file) {
+                    $paths[] = $file->store('documents/experience', 'public');
+                }
+                $data['experienceCertificatePath'] = json_encode($paths);
+            }
+
+            // ── Other documents (MBBS, training, internship)─
+            $otherDocs = [];
+            if ($request->hasFile('mbbs_degree')) {
+                $otherDocs['mbbs_degree'] = $request->file('mbbs_degree')->store('documents/mbbs', 'public');
+            }
+            if ($request->hasFile('training_certificate')) {
+                $otherDocs['training_certificate'] = $request->file('training_certificate')->store('documents/training', 'public');
+            }
+            if ($request->hasFile('internship_certificates')) {
+                $internPaths = [];
+                foreach ($request->file('internship_certificates') as $file) {
+                    $internPaths[] = $file->store('documents/internship', 'public');
+                }
+                $otherDocs['internship_certificates'] = $internPaths;
+            }
+            if (! empty($otherDocs)) {
+                $data['otherDocumentsPaths'] = json_encode($otherDocs);
+            }
+
+            $data['termsAccepted'] = $request->has('termsAccepted');
+            $data['status']        = 'pending';
+
+            // Build fullName — form sends 'fullNameOnRecord', stored as 'fullName'
+            $data['fullName'] = $request->filled('fullNameOnRecord')
+                ? $request->fullNameOnRecord
+                : trim(($request->usualForename ?? '') . ' ' . ($request->lastName ?? ''));
+
+            // Remove the form field alias to avoid mass-assignment confusion
+            unset($data['fullNameOnRecord']);
+
+            $application = Application::create($data);
+
+            DB::commit();
+
+            // ── Send confirmation email to candidate ─────────
+            if ($application->email) {
+                try {
+                    Mail::to($application->email)
+                        ->queue(new ApplicationReceived($application));
+                } catch (\Exception $mailEx) {
+                    Log::error('Failed to send ApplicationReceived email', [
+                        'application_id' => $application->id,
+                        'error'          => $mailEx->getMessage(),
+                    ]);
+                }
+            }
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Application submitted successfully! You will receive a confirmation email shortly.',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Application store failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'An error occurred while processing your application. Please try again.',
+            ], 500);
+        }
+    }
+
+    // ─────────────────────────────────────────────
+    // ADMIN ENDPOINTS  (used from Project-Management-System)
+    // ─────────────────────────────────────────────
+
+    /**
+     * Admin – list applications with search, filter, stats.
+     */
+    public function adminIndex(Request $request)
+    {
+        $search = $request->input('search');
+        $status = $request->input('status');
+        $type   = $request->input('type');
+
+        $query = Application::query()
+            ->search($search)
+            ->when($status, fn ($q, $s) => $q->where('status', $s))
+            ->when($type, fn ($q, $t)   => $q->where('candidateType', $t))
+            ->latest();
+
+        // Stats
+        $stats = [
+            'total'    => Application::count(),
+            'pending'  => Application::pending()->count(),
+            'approved' => Application::approved()->count(),
+            'rejected' => Application::rejected()->count(),
+        ];
+
+        // Charts – registrations over last 30 days
+        $timeChartData = Application::selectRaw('DATE(created_at) as date, COUNT(*) as count')
+            ->where('created_at', '>=', now()->subDays(30))
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        // Status chart
+        $statusChartData = [
+            'labels' => ['Pending', 'Approved', 'Rejected'],
+            'series' => [
+                Application::pending()->count(),
+                Application::approved()->count(),
+                Application::rejected()->count(),
+            ],
+            'colors' => ['#f59e0b', '#10b981', '#ef4444'],
+        ];
+
+        $applications = $query->paginate(15)->withQueryString();
+
+        return view('admin.applications.index', compact(
+            'applications', 'stats', 'search', 'status', 'type',
+            'timeChartData', 'statusChartData'
+        ));
+    }
+
+    /**
+     * Admin – show single application.
+     */
+    public function adminShow(Application $application)
+    {
+        return view('admin.applications.show', compact('application'));
+    }
+
+    /**
+     * Admin – update application status (approve/reject).
+     */
+    public function updateStatus(Request $request, Application $application): \Illuminate\Http\RedirectResponse
+    {
+        $request->validate([
+            'status'        => 'required|in:approved,rejected,pending',
+            'admin_message' => 'nullable|string|max:2000',
+        ]);
+
+        $application->update([
+            'status'        => $request->status,
+            'admin_message' => $request->admin_message,
+        ]);
+
+        // Send email notification based on status
+        if ($application->email) {
+            try {
+                if ($request->status === 'rejected') {
+                    // Use dedicated rejection email
+                    Mail::to($application->email)
+                        ->queue(new ApplicationRejected($application));
+                } elseif ($request->status === 'approved') {
+                    // Use generic status-changed for approvals
+                    Mail::to($application->email)
+                        ->queue(new ApplicationStatusChanged($application));
+                }
+            } catch (\Exception $e) {
+                Log::error('Failed to send status email', [
+                    'application_id' => $application->id,
+                    'status'         => $request->status,
+                    'error'          => $e->getMessage(),
+                ]);
+            }
+        }
+
+        $statusLabel = ucfirst($request->status);
+
+        return redirect()
+            ->route('admin.applications.show', $application)
+            ->with('success', "Application {$statusLabel} successfully.");
+    }
+}
