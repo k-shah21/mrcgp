@@ -82,17 +82,38 @@ class StoreApplicationRequest extends FormRequest
             'termsAccepted.accepted' => 'You must carefully review and accept the Terms and Conditions before proceeding with the application.',
             'eligibilityCriterion.required' => 'Please select an Eligibility Criterion so we can determine the exact documents required for your application.',
             'eligibilityCriterion.in' => 'The selected Eligibility Criterion is not recognized. Please choose a valid option (A, B, or C).',
+
+            // File validations
             'passportImage.required' => 'A clear Passport Size Photograph is mandatory for your application profile. Please upload a profile image file.',
             'passportImage.image' => 'The uploaded file for the Passport Image must be a valid image format (e.g., jpeg, png, jpg).',
+            'passportImage.mimes' => 'The Passport Image must be a file of type: jpeg, png, jpg.',
             'passportImage.max' => 'The Passport Image file size must not exceed 5MB. Please compress the image and try again.',
+
             'passport_bio_page.required' => 'The Bio-data Page of your Passport is required to verify your identity. Please ensure you upload a clear, legible copy.',
-            'passport_bio_page.max' => 'The Passport Bio-data Page file size must not exceed 5MB.',
+            'passport_bio_page.mimes' => 'The Passport Bio-data Page must be a file of type: jpeg, png, jpg, pdf.',
+            'passport_bio_page.max' => 'The Passport Bio-data Page file size must not exceed 5MB. Please shrink the file and try again.',
+
             'valid_license.required' => 'A Valid Medical License document is mandatory. Please provide a copy in jpeg, png, jpg, or pdf format.',
-            'valid_license.max' => 'The Medical License file size must not exceed 3MB.',
+            'valid_license.mimes' => 'The Medical License must be a file of type: jpeg, png, jpg, pdf.',
+            'valid_license.max' => 'The Medical License file size must not exceed 3MB. Please compress the document and try again.',
+
             'mbbs_degree.required' => 'Your MBBS Degree Certificate is required to confirm your foundational medical qualifications.',
+            'mbbs_degree.mimes' => 'The MBBS Degree Certificate must be a file of type: jpeg, png, jpg, pdf.',
+            'mbbs_degree.max' => 'The MBBS Degree Certificate file size must not exceed 5MB. Please reduce its size and try again.',
+
             'training_certificate.required' => 'A valid Training or Diploma certificate is required based on your selected Eligibility Criterion.',
+            'training_certificate.mimes' => 'The Training or Diploma certificate must be a file of type: jpeg, png, jpg, pdf.',
+            'training_certificate.max' => 'The Training or Diploma certificate file size must not exceed 5MB.',
+
             'internship_certificates.required' => 'Please upload your Internship Certificates. At least one document is required to prove your applied training.',
+            'internship_certificates.*.mimes' => 'Each Internship Certificate must be a file of type: jpeg, png, jpg, pdf.',
+            'internship_certificates.*.max' => 'Each Internship Certificate must not exceed 5MB in size.',
+
             'experience_certificates.required' => 'Please upload your Experience Certificates. These are required for your selected Eligibility Criterion.',
+            'experience_certificates.*.mimes' => 'Each Experience Certificate must be a file of type: jpeg, png, jpg, pdf.',
+            'experience_certificates.*.max' => 'Each Experience Certificate must not exceed 5MB in size.',
+
+            // Other fields
             'examCenterPreference.required' => 'You must select a preferred Examination Center to help us schedule your assessment correctly.',
             'whatsappNumber.required' => 'Your WhatsApp Number is required for potential immediate communications.',
             'emergencyContactNumber.required' => 'An Emergency Contact Number is mandatory in case we need to reach someone on your behalf urgently.',

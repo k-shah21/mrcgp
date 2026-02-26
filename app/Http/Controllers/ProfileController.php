@@ -44,6 +44,9 @@ class ProfileController extends Controller
     {
         $request->validateWithBag('userDeletion', [
             'password' => ['required', 'current_password'],
+        ], [
+            'password.required' => 'Please enter your current password to confirm account deletion.',
+            'password.current_password' => 'The password you entered does not match your current password. Please try again.',
         ]);
 
         $user = $request->user();

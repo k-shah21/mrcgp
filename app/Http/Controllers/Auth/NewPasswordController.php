@@ -34,6 +34,12 @@ class NewPasswordController extends Controller
             'token' => ['required'],
             'email' => ['required', 'email'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ], [
+            'token.required' => 'The password reset token is missing. Please use the link from the email we sent you.',
+            'email.required' => 'Please enter the email address associated with your account.',
+            'email.email' => 'The email address format is invalid. Please enter a valid email (e.g., name@example.com).',
+            'password.required' => 'Please enter a new password.',
+            'password.confirmed' => 'The new password and confirmation do not match. Please re-enter both fields.',
         ]);
 
         // Here we will attempt to reset the user's password. If it is successful we

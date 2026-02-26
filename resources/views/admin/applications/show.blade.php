@@ -179,9 +179,9 @@
                     @endif
 
                     @php
-                        $otherDocs = is_string($application->otherDocumentsPaths)
-                            ? json_decode($application->otherDocumentsPaths, true)
-                            : $application->otherDocumentsPaths;
+$otherDocs = is_string($application->otherDocumentsPaths)
+    ? json_decode($application->otherDocumentsPaths, true)
+    : $application->otherDocumentsPaths;
                     @endphp
 
                     @if($otherDocs && is_array($otherDocs))
@@ -209,9 +209,9 @@
 
                     @if($application->experienceCertificatePath)
                         @php
-                            $expPaths = is_string($application->experienceCertificatePath)
-                                ? json_decode($application->experienceCertificatePath, true)
-                                : $application->experienceCertificatePath;
+    $expPaths = is_string($application->experienceCertificatePath)
+        ? json_decode($application->experienceCertificatePath, true)
+        : $application->experienceCertificatePath;
                         @endphp
                         @if(is_array($expPaths))
                             <div class="border border-slate-200 rounded-xl p-3">
@@ -250,10 +250,10 @@ $statusColors = match ($application->status) {
                             {{ ucfirst($application->status ?? 'pending') }}
                         </span>
                         
-                        @if($application->admin_message)
-                            <div class="mt-4 p-3 bg-slate-50 rounded-xl border border-slate-200 text-left">
-                                <p class="text-[11px] uppercase tracking-wide text-slate-400 font-semibold mb-1">Admin Message</p>
-                                <p class="text-xs text-slate-700">{{ $application->admin_message }}</p>
+                        @if($application->status === 'rejected' && $application->rejection_reason)
+                            <div class="mt-4 p-3 bg-rose-50 rounded-xl border border-rose-200 text-left">
+                                <p class="text-[11px] uppercase tracking-wide text-rose-400 font-semibold mb-1">Rejection Reason</p>
+                                <p class="text-xs text-rose-700">{{ $application->rejection_reason }}</p>
                             </div>
                         @endif
                         </div>
@@ -278,40 +278,42 @@ $statusColors = match ($application->status) {
                         {{-- Reject Action --}}
                         @if($application->status !== 'rejected' && $application->status !== 'approved')
                             <x-card title="Reject Application" subtitle="Decline this application">
-                                <!-- Toggle Button at Top Right -->
-                                <div class="absolute top-4 right-2 flex justify-end mb-3">
-                                    <label for="send-email" class="inline-flex items-center cursor-pointer text-xs text-slate-600">
-                                        <span class="mr-2">Send Mail?</span>
-                                        <div class="relative">
-                                            <input type="checkbox" id="send-email" name="send_email" class="sr-only peer">
-                                            <div class="w-9 h-5 bg-slate-300 rounded-full peer-checked:bg-rose-600 transition-all"></div>
-                                            <div
-                                                class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-4 transition-all">
-                                            </div>
-                                        </div>
-                                    </label>
-                                </div>
-
                                 <form method="POST" action="{{ route('admin.applications.update-status', $application) }}">
                                     @csrf
                                     @method('PATCH')
                                     <input type="hidden" name="status" value="rejected">
 
+                                    {{-- Send Email Toggle --}}
+                                    <div class="flex items-center justify-between mb-3 p-2 bg-slate-50 rounded-lg border border-slate-200">
+                                        <span class="text-xs font-medium text-slate-600">Notify candidate via email?</span>
+                                        <label for="send-email" class="inline-flex items-center cursor-pointer">
+                                            <div class="relative">
+                                                <input type="checkbox" id="send-email" name="send_email" value="1" class="sr-only peer">
+                                                <div class="w-9 h-5 bg-slate-300 rounded-full peer-checked:bg-rose-600 transition-all"></div>
+                                                <div
+                                                    class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-4 transition-all">
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+
                                     <div class="mb-3">
                                         <label class="block text-[11px] font-semibold uppercase tracking-wide text-slate-500 mb-1">
                                             Reason (optional)
                                         </label>
-                                        <textarea name="admin_message" rows="3" placeholder="Your application has been rejected because..."
+                                        <textarea name="rejection_reason" rows="3" placeholder="Your application has been rejected because..."
                                             class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/70 transition-all"></textarea>
-                                    </div>
+                                        <p class="text-[10px] text-slate-400 mt-1">If provided and email is toggled on, this reason will be included
+                                            in the notification email.</p>
+                                        </div>
 
-                                        <button type="submit"
-                                            class="w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-rose-600 px-4 py-2 text-xs font-semibold text-white hover:bg-rose-700 transition shadow-sm"
-                                            onclick="return confirm('Are you sure you want to reject this application?')">
-                                            <i class="ri-close-line text-sm"></i> Reject Application
-                                        </button>
-                                    </form>
-                                </x-card>
+                                            <button type="submit"
+                                                class="w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-rose-600 px-4 py-2 text-xs font-semibold text-white hover:bg-rose-700 transition shadow-sm"
+                                                onclick="return confirm('Are you sure you want to reject this application?')">
+                                                <i class="ri-close-line text-sm"></i> Reject Application
+                                            </button>
+                                        </form>
+                                    </x-card>
                         @endif
 
             {{-- Reset to Pending --}}

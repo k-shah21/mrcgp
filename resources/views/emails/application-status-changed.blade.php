@@ -140,10 +140,10 @@
                     </span>
                 </p>
 
-                @if($application->admin_message)
+                @if($application->rejection_reason)
                     <div class="message-box">
-                        <p class="message-label">Message from Administration</p>
-                        <p class="message-text">{{ $application->admin_message }}</p>
+                        <p class="message-label">Reason for Rejection</p>
+                        <p class="message-text">{{ $application->rejection_reason }}</p>
                     </div>
                 @endif
 

@@ -12,7 +12,7 @@ class Application extends Model
         'passportNumber',
         'candidateType',
         'fullName',
-        'fullNameOnRecord',   // form alias — mapped to fullName in controller
+        'fullNameOnRecord',
         'passportImagePath',
         'usualForename',
         'lastName',
@@ -43,7 +43,7 @@ class Application extends Model
         'experienceCertificatePath',
         'otherDocumentsPaths',
         'status',
-        'admin_message',
+        'rejection_reason',
     ];
 
     protected $casts = [

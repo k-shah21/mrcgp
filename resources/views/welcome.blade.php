@@ -72,44 +72,6 @@
                                         </div>
                                     </div>
                                     <div class="overflow-hidden text-sm px-4 pt-4 pb-6 bg-white space-y-6">
-
-                                        <!-- Instruction Message -->
-                                        <div role="alert"
-                                            class="relative w-full rounded-lg border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 text-foreground mb-1 border-amber-200 bg-amber-50">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                                stroke-linecap="round" stroke-linejoin="round"
-                                                class="lucide lucide-alert-triangle h-4 w-4 text-amber-800">
-                                                <path
-                                                    d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
-                                                <path d="M12 9v4" />
-                                                <path d="M12 17h.01" />
-                                            </svg>
-                                            <div class="text-sm [&_p]:leading-relaxed text-amber-800 font-medium">
-                                                Cannot use duplicate email. Duplicate entry of the same candidate is not
-                                                eligible.
-                                            </div>
-                                        </div>
-
-                                        <!-- Disclaimer Checkbox -->
-                                        <div
-                                            class="flex flex-row items-start space-x-3 space-y-0 p-4 border rounded-md bg-slate-50">
-                                            <button type="button" role="checkbox" aria-checked="false"
-                                                data-state="unchecked" value="on"
-                                                class="peer size-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground bg-white border-slate-300 data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600"
-                                                id="duplicate-disclaimer-btn"></button>
-                                            <input type="checkbox" name="duplicateDisclaimer" id="duplicate-disclaimer"
-                                                class="hidden">
-                                            <div class="space-y-1 leading-none">
-                                                <label
-                                                    class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-slate-700 cursor-pointer"
-                                                    for="duplicate-disclaimer-btn">
-                                                    I understand that if I make a duplicate entry of the same candidate
-                                                    my application will get rejected.
-                                                </label>
-                                            </div>
-                                        </div>
-
                                         <!-- Old / New Radios -->
                                         <div class="space-y-3">
                                             <label
@@ -235,6 +197,21 @@
                                                         id="step1-passportNumber" value="" required>
                                                 </div>
                                             </div>
+<!-- Disclaimer Checkbox -->
+<div class="flex flex-row items-start space-x-3 space-y-0 p-4 border rounded-md bg-slate-50">
+    <button type="button" role="checkbox" aria-checked="false" data-state="unchecked" value="on"
+        class="peer size-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground bg-white border-slate-300 data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600"
+        id="duplicate-disclaimer-btn"></button>
+    <input type="checkbox" name="duplicateDisclaimer" id="duplicate-disclaimer" class="hidden">
+    <div class="space-y-1 leading-none">
+        <label
+            class="data-[state=checked]:text-indigo-600 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-slate-700 cursor-pointer"
+            for="duplicate-disclaimer-btn">
+            I understand that if I make a duplicate entry of the same candidate
+            my application will get rejected.
+        </label>
+    </div>
+</div>
 
                                             <div class="flex justify-end pt-4">
                                                 <button type="button" id="check-eligibility-btn"
@@ -392,8 +369,7 @@
                                         </div>
 
                                         <div class="space-y-2 mt-6">
-                                            <label class="text-sm font-medium leading-none">Passport Image
-                                                (Scan) <span class="text-red-500">*</span></label>
+                                            <label class="text-sm font-medium leading-none">Passport Size Photograph <span class="text-red-500">*</span></label>
                                             <div class="flex items-center justify-center w-full">
                                                 <label for="passport-image"
                                                     class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 border-slate-300 hover:bg-slate-100">
@@ -410,7 +386,7 @@
                                                         </svg>
                                                         <p class="mb-2 text-sm text-slate-500"><span
                                                                 class="font-semibold">Click to upload</span>
-                                                            passport image</p>
+                                                            profile photograph</p>
                                                         <p class="text-xs text-slate-500">JPG, JPEG, PNG (MAX.
                                                             5MB)</p>
                                                     </div>
@@ -629,7 +605,7 @@
                                                                 name="examCenterPreference"
                                                                 id="center-{{ strtolower($city) }}"
                                                                 value="{{ $city }}"
-                                                                class="w-4 h-4 text-indigo-600 bg-gray-100 border-gray-300 focus:ring-indigo-500 focus:ring-2">
+                                                                class="w-4 h-4 text-indigo-600">
                                                             <span class="text-sm font-medium text-gray-900 group-hover:text-indigo-700 transition-colors">{{ $city }}</span>
                                                         </label>
                                                         @endforeach
@@ -911,7 +887,8 @@
                                             <input id="signature" type="file" class="hidden"
                                                 accept=".png, .jpg, .jpeg, .pdf">
                                         </div>
-                                        <div class="space-y-2" data-doc="passport_bio">
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div class="space-y-2" data-doc="passport_bio">
                                             <label
                                                 class="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-sm font-medium">
                                                 Passport Bio Page (Valid)
@@ -978,7 +955,7 @@
                                         </div>
                                         <div class="space-y-2" data-doc="mbbs_degree">
                                             <label
-                                                class="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-sm         font-medium">MBBS
+                                                class="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-sm font-medium">MBBS
                                                 Degree <span class="text-red-500">*</span>
                                             </label>
                                             <div class="flex items-center justify-center w-full">
@@ -1103,6 +1080,7 @@
                                                     accept=".png, .jpg, .jpeg, .pdf" name="experience_certificates[]">
                                             </label>
                                         </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1218,6 +1196,7 @@
                 sigCtx.closePath();
                 // Save data URL to hidden input
                 document.getElementById('signature-data').value = sigCanvas.toDataURL('image/png');
+                clearErrorForField('signature-canvas');
             }
         }
 
@@ -1263,6 +1242,8 @@
                 uploadSection.classList.remove('hidden');
                 uploadBtn.className = 'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium h-9 px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow transition-all duration-200 transform hover:scale-105';
                 drawBtn.className = 'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium h-10 px-4 py-2 border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50';
+                clearErrorForField('signature-canvas');
+                clearErrorForField('signature-upload');
             }
         }
 
@@ -1414,37 +1395,91 @@
         }
 
         // =============================================
-        // FILE NAME DISPLAY on file inputs
+        // FILE NAME DISPLAY & IMAGE PREVIEWS
         // =============================================
         function initFileNameDisplay() {
             const fileInputs = document.querySelectorAll('input[type="file"]');
             fileInputs.forEach(input => {
                 input.addEventListener('change', function() {
-                    // Remove existing badge
-                    const existingBadge = this.closest('.space-y-2, label')?.querySelector('.file-name-badge');
+                    clearErrorForField(this);
+                    const label = this.closest('label');
+                    // Find the div containing the upload SVG and text
+                    let uploadContent = label ? (label.querySelector('.pt-5') || label.querySelector('.flex-col')) : null;
+                    if (!uploadContent && label) {
+                        // Fallback: look in the parent container
+                        const container = this.closest('.space-y-2, [data-doc]');
+                        if (container) uploadContent = container.querySelector('.pt-5') || container.querySelector('.flex-col');
+                    }
+                    
+                    // Remove existing badge/preview
+                                                                                const existingBadge = this.closest('.space-y-2, label, [data-doc]')?.querySelector('.file-name-badge');
                     if (existingBadge) existingBadge.remove();
+                    const existingPreview = label ? label.querySelector('.image-preview-container') : null;
+                    if (existingPreview) existingPreview.remove();
 
                     if (this.files && this.files.length > 0) {
+                        const file = this.files[0];
+                        const isImage = file.type.startsWith('image/');
                         const names = Array.from(this.files).map(f => f.name);
-                        const badge = document.createElement('div');
-                        badge.className = 'file-name-badge';
-                        badge.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg><span>${names.join(', ')}</span>`;
-                        
-                        // Try to insert badge after the label wrapper
-                        const container = this.closest('[data-doc]') || this.closest('.space-y-2');
-                        if (container) {
-                            container.appendChild(badge);
-                        } else {
-                            this.parentElement.after(badge);
-                        }
 
-                        // Also update the upload label text if it's inside a label
-                        const parentLabel = this.closest('label');
-                        if (parentLabel) {
-                            const uploadText = parentLabel.querySelector('.font-semibold');
-                            if (uploadText && uploadText.textContent.includes('Click')) {
-                                uploadText.textContent = '✓ File selected';
-                                uploadText.closest('p').classList.add('text-indigo-600');
+                        if (isImage && label && uploadContent) {
+                            // Hide the upload prompt, show the preview inside the label
+                            uploadContent.classList.add('hidden');
+                            label.classList.remove('h-32');
+                            label.classList.add('py-4');
+                            
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                const previewContainer = document.createElement('div');
+                                previewContainer.className = 'image-preview-container flex flex-col items-center justify-center w-full px-4';
+                                previewContainer.innerHTML = `
+                                    <img src="${e.target.result}" class="max-h-48 object-contain rounded-md shadow-sm border border-slate-200 bg-white" alt="Preview" />
+                                    <div class="mt-3 px-4 py-1.5 bg-white border border-slate-200 rounded-md text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 transition-colors pointer-events-none">
+                                        Change Image
+                                    </div>
+                                `;
+                                input.before(previewContainer);
+                            };
+                            reader.readAsDataURL(file);
+                        } else {
+                            // Non-image file (e.g., PDF) or no label container
+                            if (uploadContent) {
+                                uploadContent.classList.remove('hidden');
+                                label.classList.add('h-32');
+                                label.classList.remove('py-4');
+                            }
+                            
+                            const badge = document.createElement('div');
+                            badge.className = 'file-name-badge mt-2 w-full flex items-center justify-center';
+                            badge.innerHTML = `<div class="w-full px-3 py-2 bg-indigo-50 border border-indigo-100 rounded-md flex items-center justify-center gap-2 text-indigo-700 text-sm"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" class="shrink-0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg><span class="truncate max-w-[200px]">${names.join(', ')}</span></div>`;
+                            
+                            const container = this.closest('[data-doc]') || this.closest('.space-y-2');
+                            if (container) {
+                                container.appendChild(badge);
+                            } else {
+         this.parentElement.after(badge);
+                            }   
+
+                            if (uploadContent) {
+                                const uploadText = uploadContent.querySelector('.font-semibold');
+                                if (uploadText && uploadText.textContent.includes('Click')) {
+                                    uploadText.textContent = '✓ File selected';
+                                    uploadText.closest('p').classList.remove('text-slate-500');
+                                    uploadText.closest('p').classList.add('text-indigo-600');
+                                           }
+                            }
+                        }
+                    } else {
+             // Cleared state
+                        if (uploadContent) {
+                            uploadContent.classList.remove('hidden');
+                            label.classList.add('h-32');
+                            label.classList.remove('py-4');
+                            const uploadText = uploadContent.querySelector('.font-semibold');
+                            if (uploadText && uploadText.textContent.includes('✓')) {
+                                uploadText.textContent = 'Click to upload';
+                                uploadText.closest('p').classList.remove('text-indigo-600');
+                                uploadText.closest('p').classList.add('text-slate-500');
                             }
                         }
                     }
@@ -1459,7 +1494,7 @@
             initFileNameDisplay();
 
             const radioCheckedSVG = '<span data-state="checked" class="flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle h-2.5 w-2.5 fill-indigo-600 text-indigo-600"><circle cx="12" cy="12" r="10"></circle></svg></span>';
-            const checkboxCheckedSVG = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check h-4 w-4"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+            const checkboxCheckedSVG = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check h-4 w-4 text-white"><polyline points="20 6 9 17 4 12"></polyline></svg>';
 
             // ==============================
             // Make Radix-style Checkboxes work
@@ -1556,17 +1591,29 @@
             // Error helpers
             // ===================
             function showFieldError(inputEl, message) {
-                let container = inputEl.closest('.space-y-2') || inputEl.closest('.space-y-3') || inputEl.parentElement;
+                let container = inputEl.closest('.space-y-2') || inputEl.closest('.space-y-3') || inputEl.closest('[data-doc]') || inputEl.parentElement;
                 // Remove existing error
                 container.querySelectorAll('.error-msg').forEach(m => m.remove());
-                // Red border on input
-                if (inputEl.tagName === 'INPUT' || inputEl.tagName === 'SELECT') {
+                
+                // Red border on input or its visual counterpart
+                if (inputEl.type === 'file') {
+                    const visualLabel = container.querySelector('label[for="' + inputEl.id + '"]') || inputEl.closest('label');
+                    if (visualLabel) {
+                        visualLabel.classList.remove('border-slate-300');
+                        visualLabel.classList.add('border-red-500');
+                    }
+                } else if (inputEl.tagName === 'INPUT' || inputEl.tagName === 'SELECT') {
                     inputEl.classList.remove('border-slate-200', 'focus-visible:ring-indigo-500');
                     inputEl.classList.add('border-red-500', 'focus-visible:ring-red-500');
+                } else if (inputEl.id === 'signature-canvas') {
+                    inputEl.parentElement.classList.add('border-red-500');
+                    inputEl.parentElement.classList.remove('border-slate-200');
                 }
+
                 // Red label
-                const label = container.querySelector('label');
+                const label = container.querySelector('label:not([for="' + inputEl.id + '"])') || container.querySelector('label');
                 if (label) label.classList.add('text-red-500');
+                
                 // Error message
                 const errorP = document.createElement('p');
                 errorP.className = 'error-msg text-sm text-red-500 mt-1 font-medium transition-all duration-200';
@@ -1575,16 +1622,29 @@
             }
 
             function clearErrorForField(inputId) {
-                const el = document.getElementById(inputId);
+                const el = typeof inputId === 'string' ? document.getElementById(inputId) : inputId;
                 if (!el) return;
-                const container = el.closest('.space-y-2') || el.closest('.space-y-3') || el.closest('.grid') || el.parentElement;
+                const container = el.closest('.space-y-2') || el.closest('.space-y-3') || el.closest('[data-doc]') || el.closest('.grid') || el.parentElement;
                 if (container) {
                     container.querySelectorAll('.error-msg').forEach(msg => msg.remove());
                     container.querySelectorAll('label.text-red-500').forEach(l => l.classList.remove('text-red-500'));
+                    
+                    if (el.type === 'file') {
+                        const visualLabel = container.querySelector('label[for="' + el.id + '"]') || el.closest('label');
+                        if (visualLabel) {
+                            visualLabel.classList.remove('border-red-500');
+                            visualLabel.classList.add('border-slate-300');
+                        }
+                    } else if (el.id === 'signature-canvas') {
+                        el.parentElement.classList.remove('border-red-500');
+                        el.parentElement.classList.add('border-slate-200');
+                    }
                 }
                 el.classList.remove('border-red-500', 'focus-visible:ring-red-500');
                 if (el.tagName === 'INPUT' || el.tagName === 'SELECT') {
-                    el.classList.add('border-slate-200', 'focus-visible:ring-indigo-500');
+                    if (el.type !== 'file') {
+                        el.classList.add('border-slate-200', 'focus-visible:ring-indigo-500');
+                    }
                 }
             }
 
@@ -1602,14 +1662,19 @@
                 let firstErrorEl = null;
                 Object.keys(errors).forEach(key => {
                     const messages = errors[key];
-                    const inputEl = document.querySelector(`[name="${key}"]`);
+                    const inputEl = document.querySelector(`[name="${key}"]`) || document.getElementById(key);
                     if (inputEl && (!scopeEl || scopeEl.contains(inputEl))) {
                         showFieldError(inputEl, messages[0]);
                         if (!firstErrorEl) firstErrorEl = inputEl;
                     }
                 });
                 if (firstErrorEl) {
-                    firstErrorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    const container = firstErrorEl.closest('.space-y-2') || firstErrorEl.closest('.space-y-3') || firstErrorEl.closest('[data-doc]') || firstErrorEl.parentElement;
+                    if (container) {
+                        container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    } else {
+                        firstErrorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
                     setTimeout(() => { if (firstErrorEl.focus) firstErrorEl.focus(); }, 500);
                 }
             };
@@ -1769,8 +1834,20 @@
                         });
                         const btn = document.getElementById('duplicate-disclaimer-btn');
                         if (btn) {
+                           // Remove any conflicting border color classes
+                            btn.classList.remove('border-slate-300', 'border-indigo-600');
+                            // Add red border
                             btn.classList.add('border-red-500');
+
+                            // Optional: scroll into view
                             btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                            // Also optionally change label color to red
+                            const label = document.querySelector("label[for='duplicate-disclaimer-btn']");
+                            if (label) {
+                                label.classList.remove('text-slate-700', 'text-indigo-600');
+                                label.classList.add('text-red-500');
+                            }
                         }
                         return;
                     }
@@ -1778,17 +1855,17 @@
                     // Validate Step 1 required fields
                     const step1Errors = {};
                     const forenameVal = document.getElementById('usualForename').value.trim();
-                    if (!forenameVal) step1Errors['usualForename'] = ['Usual Forename is required'];
+                    if (!forenameVal) step1Errors['usualForename'] = ['Please enter your Usual Forename as it appears on your official documents.'];
                     const lastNameVal = document.getElementById('lastName').value.trim();
-                    if (!lastNameVal) step1Errors['lastName'] = ['Last Name is required'];
+                    if (!lastNameVal) step1Errors['lastName'] = ['Please enter your Last Name as it appears on your official documents.'];
                     const emailVal = document.getElementById('email').value.trim();
                     if (!emailVal) {
-                        step1Errors['email'] = ['Email is required'];
+                        step1Errors['email'] = ['An email address is required so we can send you important updates about your application.'];
                     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
-                        step1Errors['email'] = ['Invalid email address'];
+                        step1Errors['email'] = ['The email address you entered does not look valid. Please use a format like name@example.com.'];
                     }
                     const passportVal = document.getElementById('step1-passportNumber').value.trim();
-                    if (!passportVal) step1Errors['passportNumber'] = ['Passport Number is required'];
+                    if (!passportVal) step1Errors['passportNumber'] = ['Please provide your Passport Number exactly as it appears on your passport.'];
 
                     // if (currentCandidateType === 'old') {
                     //     const candId = document.getElementById('step1-candidateId').value.trim();
@@ -1797,12 +1874,6 @@
                     // }
 
                     if (Object.keys(step1Errors).length > 0) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Validation Error',
-                            text: 'Please fill in all required fields correctly.',
-                            confirmButtonColor: '#6366f1',
-                        });
                         showInlineErrors(step1Errors, step1);
                         return;
                     }
@@ -1859,25 +1930,26 @@
                                 // Duplicate detected
                                 Swal.fire({
                                     icon: 'error',
-                                    title: 'Duplicate Application',
-                                    text: data.message || 'A duplicate application was detected.',
+                                    title: 'Duplicate Application Found',
+                                    text: data.message || 'It appears you have already submitted an application with these details.',
                                     confirmButtonColor: '#6366f1',
                                 });
                                 if (data.errors) showInlineErrors(data.errors, step1);
                             } else if (xhr.status === 422) {
-                                // Validation errors
+                                // Validation errors from server
+                                if (data.errors) showInlineErrors(data.errors, step1);
+                            } else if (xhr.status === 0) {
                                 Swal.fire({
                                     icon: 'error',
-                                    title: 'Validation Error',
-                                    text: 'Please fix the errors below.',
+                                    title: 'Connection Problem',
+                               text: 'We could not reach the server. Please check your internet connection and try again.',
                                     confirmButtonColor: '#6366f1',
-                                });
-                                if (data.errors) showInlineErrors(data.errors, step1);
+                                }); 
                             } else {
                                 Swal.fire({
                                     icon: 'error',
-                                    title: 'Server Error',
-                                    text: 'An unexpected error occurred. Please try again.',
+                        title: 'Something Went Wrong',
+                        text: data.message || 'We encountered a temporary issue while checking your eligibility. Please wait a moment and try again. If this keeps happening, contact support.',
                                     confirmButtonColor: '#6366f1',
                                 });
                             }
@@ -1929,20 +2001,20 @@
                 Object.entries(eduFields).forEach(([id, label]) => {
                     const el = document.getElementById(id);
                     if (el && !el.value.trim()) {
-                        step2Errors[el.name || id] = [label.trim() + ' is required'];
+                        step2Errors[el.name || id] = ['Please fill in the "' + label.trim() + '" field before submitting.'];
                     }
                 });
 
                 // Check exam center
                 const selectedCenter = document.querySelector('#examCenterPreference input[type="radio"]:checked');
                 if (!selectedCenter) {
-                    step2Errors['examCenterPreference'] = ['Please select an examination center'];
+                    step2Errors['examCenterPreference'] = ['Please choose a preferred Examination Center from the options above so we can schedule your exam.'];
                 }
 
                 // Check terms
                 const termsCb = document.querySelector('input[name="termsAccepted"]');
                 if (!termsCb || !termsCb.checked) {
-                    step2Errors['termsAccepted'] = ['You must accept the terms and conditions'];
+                    step2Errors['termsAccepted'] = ['You must read and accept the Terms and Conditions to proceed with submission.'];
                 }
 
                 // Check eligibility for new candidates
@@ -1950,19 +2022,11 @@
                     // Use native radio selector (no longer Radix buttons)
                     const checkedElig = document.querySelector('#eligibility input[name="eligibilityCriterion"]:checked');
                     if (!checkedElig) {
-                        step2Errors['eligibilityCriterion'] = ['Please select an eligibility criterion'];
+                        step2Errors['eligibilityCriterion'] = ['Please select an Eligibility Criterion (A, B, or C) to indicate your qualification pathway.'];
                     }
                 }
 
                 if (Object.keys(step2Errors).length > 0) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Validation Error',
-                        html: '<div style="text-align:left;font-size:14px;">' +
-                            Object.values(step2Errors).map(msgs => `<p style="margin-bottom:4px;">• ${msgs[0]}</p>`).join('') +
-                            '</div>',
-                        confirmButtonColor: '#6366f1',
-                    });
                     showInlineErrors(step2Errors);
                     return;
                 }
@@ -1973,38 +2037,37 @@
                 const hasSig = (sigData && sigData.length > 10) || (sigUpload && sigUpload.files.length > 0);
 
                 if (!hasSig) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Signature Required',
-                        text: 'Please draw or upload your signature before submitting.',
-                        confirmButtonColor: '#6366f1',
-                    });
-                    document.querySelector('#signature-draw-section, #signature-upload-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    const sigSection = document.getElementById('signature-draw-section');
+                    const uploadSection = document.getElementById('signature-upload-section');
+                    const visibleSigSection = (sigSection && !sigSection.classList.contains('hidden')) ? sigSection : uploadSection;
+                    
+                    if (visibleSigSection) {
+                        const errorTarget = (visibleSigSection.id === 'signature-draw-section') ? document.getElementById('signature-canvas') : document.getElementById('signature-upload');
+                        showFieldError(errorTarget, 'Please provide your signature.');
+                        visibleSigSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        if (errorTarget.focus) setTimeout(() => errorTarget.focus(), 500);
+                    }
                     return;
                 }
 
                 // Check other visible documents
                 const visibleDocs = document.querySelectorAll('[data-doc]:not(.hidden)');
-                let missingDocs = [];
+                let firstMissingDocEl = null;
                 visibleDocs.forEach(docEl => {
                     const docKey = docEl.getAttribute('data-doc');
                     if (docKey === 'signature') return; // handled above
 
                     const fileInput = docEl.querySelector('input[type="file"]');
                     if (fileInput && fileInput.files.length === 0) {
-                        const labelText = docEl.querySelector('label')?.innerText.replace('*', '').trim();
-                        missingDocs.push(labelText || docKey);
+                        showFieldError(fileInput, 'This document is required.');
+                        if (!firstMissingDocEl) firstMissingDocEl = docEl;
                     }
                 });
 
-                if (missingDocs.length > 0) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Missing Documents',
-                        html: '<p>Please upload the following required documents:</p><ul class="text-left mt-2">' +
-                            missingDocs.map(d => `<li>• ${d}</li>`).join('') + '</ul>',
-                        confirmButtonColor: '#6366f1',
-                    });
+                if (firstMissingDocEl) {
+                    firstMissingDocEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    const fileInput = firstMissingDocEl.querySelector('input[type="file"]');
+                    if (fileInput) setTimeout(() => fileInput.focus(), 500);
                     return;
                 }
 
@@ -2085,24 +2148,24 @@
                         if (xhr.status === 409) {
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Duplicate Application',
-                                text: data.message || 'A duplicate application was detected.',
+                                title: 'Duplicate Application Found',
+                                text: data.message || 'It appears this application has already been submitted. Duplicate entries are not permitted.',
                                 confirmButtonColor: '#6366f1',
                             });
                         } else if (xhr.status === 422) {
-                            const errorList = data.errors ? Object.values(data.errors).map(msgs => `<p style="margin-bottom:4px;">• ${msgs[0]}</p>`).join('') : '';
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Validation Error',
-                                html: '<div style="text-align:left;font-size:14px;">' + errorList + '</div>',
-                                confirmButtonColor: '#6366f1',
-                            });
                             if (data.errors) showInlineErrors(data.errors);
+                        } else if (xhr.status === 0) {
+                            Swal.fire({
+                               icon: 'error',
+                                title: 'Connection Problem',
+                                text: 'We could not reach the server. Please check your internet connection and try again.',
+                                confirmButtonColor: '#6366f1',
+                            }); 
                         } else {
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Server Error',
-                                text: data.message || 'An unexpected error occurred. Please try again.',
+                                title: 'Something Went Wrong',
+                                text: data.message || 'We experienced a temporary issue while submitting your application. No data has been saved. Please wait a moment and try again. If this persists, contact our support team.',
                                 confirmButtonColor: '#6366f1',
                             });
                         }

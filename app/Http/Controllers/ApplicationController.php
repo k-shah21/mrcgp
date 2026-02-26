@@ -6,7 +6,6 @@ use App\Http\Requests\CheckEligibilityRequest;
 use App\Http\Requests\StoreApplicationRequest;
 use App\Mail\ApplicationReceived;
 use App\Mail\ApplicationRejected;
-use App\Mail\ApplicationStatusChanged;
 use App\Models\Application;
 use App\Models\OldCandidate;
 use Illuminate\Http\JsonResponse;
@@ -294,39 +293,51 @@ class ApplicationController extends Controller
     {
         $request->validate([
             'status' => 'required|in:approved,rejected,pending',
-            'admin_message' => 'nullable|string|max:2000',
+            'rejection_reason' => 'nullable|string|max:2000',
+            'send_email' => 'nullable',
+        ], [
+            'status.required' => 'Please select a status (Approved, Rejected, or Pending) before saving.',
+            'status.in' => 'The selected status is not valid. Please choose Approved, Rejected, or Pending.',
+            'rejection_reason.max' => 'The rejection reason is too long. Please keep it under 2000 characters.',
         ]);
 
-        $application->update([
-            'status' => $request->status,
-            'admin_message' => $request->admin_message,
-        ]);
+        $updateData = ['status' => $request->status];
 
-        // Send email notification based on status
-        if ($application->email) {
+        if ($request->status === 'rejected') {
+            // Store rejection reason (optional)
+            $updateData['rejection_reason'] = $request->rejection_reason;
+        } else {
+            // Clear rejection reason when approving or resetting to pending
+            $updateData['rejection_reason'] = null;
+        }
+
+        $application->update($updateData);
+
+        // Only send email on rejection AND only when the send_email toggle is on
+        if ($request->status === 'rejected' && $request->has('send_email') && $application->email) {
             try {
-                if ($request->status === 'rejected') {
-                    // Use dedicated rejection email
-                    Mail::to($application->email)
-                        ->queue(new ApplicationRejected($application));
-                } elseif ($request->status === 'approved') {
-                    // Use generic status-changed for approvals
-                    Mail::to($application->email)
-                        ->queue(new ApplicationStatusChanged($application));
-                }
+                Mail::to($application->email)
+                    ->queue(new ApplicationRejected($application));
             } catch (\Exception $e) {
-                Log::error('Failed to send status email', [
+                Log::error('Failed to send rejection email', [
                     'application_id' => $application->id,
-                    'status' => $request->status,
                     'error' => $e->getMessage(),
                 ]);
+
+                return redirect()
+                    ->route('admin.applications.show', $application)
+                    ->with('warning', 'Application rejected but the notification email could not be sent.');
             }
         }
 
         $statusLabel = ucfirst($request->status);
+        $emailNote = '';
+        if ($request->status === 'rejected' && $request->has('send_email')) {
+            $emailNote = ' A notification email has been sent to the candidate.';
+        }
 
         return redirect()
             ->route('admin.applications.show', $application)
-            ->with('success', "Application {$statusLabel} successfully.");
+            ->with('success', "Application {$statusLabel} successfully.{$emailNote}");
     }
 }

@@ -33,6 +33,18 @@ class LoginRequest extends FormRequest
     }
 
     /**
+     * Get the error messages for the defined validation rules.
+     */
+    public function messages(): array
+    {
+        return [
+            'email.required' => 'Please enter your email address to log in.',
+            'email.email' => 'The email address format is invalid. Please enter a valid email (e.g., name@example.com).',
+            'password.required' => 'Please enter your password to log in.',
+        ];
+    }
+
+    /**
      * Attempt to authenticate the request's credentials.
      *
      * @throws \Illuminate\Validation\ValidationException
@@ -45,7 +57,7 @@ class LoginRequest extends FormRequest
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'email' => 'The email or password you entered is incorrect. Please double-check your credentials and try again.',
             ]);
         }
 
@@ -68,10 +80,7 @@ class LoginRequest extends FormRequest
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'email' => trans('auth.throttle', [
-                'seconds' => $seconds,
-                'minutes' => ceil($seconds / 60),
-            ]),
+            'email' => 'You have made too many login attempts. Please wait ' . ceil($seconds / 60) . ' minute(s) before trying again.',
         ]);
     }
 

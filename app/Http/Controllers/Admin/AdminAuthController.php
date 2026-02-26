@@ -33,6 +33,11 @@ class AdminAuthController extends Controller
         $request->validate([
             'email'    => 'required|email',
             'password' => 'required|string|min:6',
+        ], [
+            'email.required' => 'Please enter your admin email address to log in.',
+            'email.email' => 'The email address format is invalid. Please enter a valid email (e.g., admin@example.com).',
+            'password.required' => 'Please enter your password to log in.',
+            'password.min' => 'Your password must be at least 6 characters long.',
         ]);
 
         if (\Illuminate\Support\Facades\Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
@@ -55,7 +60,7 @@ class AdminAuthController extends Controller
 
         return back()
             ->withInput($request->only('email'))
-            ->withErrors(['email' => 'Invalid credentials. Please try again.']);
+            ->withErrors(['email' => 'The email or password you entered is incorrect. Please double-check your credentials and try again.']);
     }
 
     /**
