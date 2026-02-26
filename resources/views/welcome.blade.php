@@ -10,7 +10,9 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <!-- intl-tel-input (country code + flags) -->
+    <!-- Dropzone.js -->
+    <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
     <style>
         /* File name badge */
         .file-name-badge { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; padding: 4px 12px; background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 6px; font-size: 13px; color: #4338ca; max-width: 100%; }
@@ -25,6 +27,20 @@
         .phone-country-dropdown .country-option.selected { background: #e0e7ff; }
         .phone-country-dropdown .country-option img { width: 22px; height: 16px; border-radius: 2px; object-fit: cover; }
         .phone-country-dropdown .country-option .dial { color: #6366f1; font-weight: 500; margin-left: auto; }
+
+        /* Dropzone Custom Styling */
+        .dropzone { border: 2px dashed #cbd5e1 !important; border-radius: 0.5rem !important; background: #f8fafc !important; min-height: 120px !important; padding: 1rem !important; display: flex !important; flex-wrap: wrap !important; gap: 1rem !important; align-items: center !important; justify-content: center !important; transition: all 0.2s ease !important; }
+        .dropzone:hover { background: #f1f5f9 !important; border-color: #6366f1 !important; }
+        .dropzone.dz-drag-hover { background: #eef2ff !important; border-color: #6366f1 !important; }
+        .dropzone.dz-started .dz-message { display: none !important; }
+        .dropzone .dz-message { margin: 0 !important; font-family: inherit !important; color: #64748b !important; }
+        .dropzone .dz-preview { margin: 0 !important; min-height: unset !important; }
+        .dropzone .dz-preview .dz-image { border-radius: 0.375rem !important; width: 100px !important; height: 100px !important; }
+        .dropzone .dz-preview .dz-details { padding: 0.5rem !important; opacity: 0 !important; transition: opacity 0.2s !important; }
+        .dropzone .dz-preview:hover .dz-details { opacity: 1 !important; }
+        .dropzone .dz-preview .dz-remove { color: #ef4444 !important; font-weight: 500 !important; font-size: 0.75rem !important; text-decoration: none !important; margin-top: 0.25rem !important; display: block !important; border: 1px solid #fee2e2 !important; border-radius: 0.25rem !important; padding: 2px 4px !important; background: #fff !important; }
+        .dropzone .dz-preview .dz-remove:hover { background: #fee2e2 !important; }
+        .dropzone .dz-error-message { top: 110px !important; }
     </style>
 </head>
 
@@ -877,15 +893,13 @@
                                                                         name="signatureUpload">
                                                                 </label>
                                                             </div>
+                                                            <p class="text-xs text-slate-500 mt-2" id="sig-upload-hint">
+                                                                JPG, JPEG, PNG (MAX. 3MB)</p>
                                                         </div>
                                                     </div>
-                                                    <p class="text-xs text-slate-500">
-                                                        JPG, JPEG, PNG (MAX. 3MB), PDF (MAX. 5MB)</p>
                                                 </div>
 
                                             </div>
-                                            <input id="signature" type="file" class="hidden"
-                                                accept=".png, .jpg, .jpeg, .pdf">
                                         </div>
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div class="space-y-2" data-doc="passport_bio">
@@ -1395,90 +1409,96 @@
         }
 
         // =============================================
-        // FILE NAME DISPLAY & IMAGE PREVIEWS
+        // DROPZONE INITIALIZATION
         // =============================================
-        function initFileNameDisplay() {
-            // Use event delegation for all file inputs
-            document.body.addEventListener('change', function(e) {
-                const input = e.target;
-                if (input.tagName !== 'INPUT' || input.type !== 'file') return;
+        const dropzoneInstances = {};
 
-                // Immediately clear errors for this specific field
-                clearErrorForField(input);
+        function initDropzones() {
+            if (typeof Dropzone === 'undefined') {
+                console.warn('Dropzone library not loaded yet. Retrying...');
+                setTimeout(initDropzones, 500);
+                return;
+            }
+            
+            Dropzone.autoDiscover = false;
+
+            // Find all file inputs
+            const fileInputs = document.querySelectorAll('input[type="file"]');
+            
+            fileInputs.forEach(input => {
+                const name = input.name;
+                const id = input.id || 'dz-input-' + name.replace(/[\[\]]/g, '');
+                if (!input.id) input.id = id;
                 
-                const uploadLabel = input.closest('label'); // The dashed box
-                // We want to place the preview/badge inside the container that holds the label
-                // Parent is usually the center-aligned div. Use parent directly to avoid matching the label itself if it has similar classes.
-                const visualContainer = uploadLabel ? uploadLabel.parentElement : input.parentElement;
+                // Skip if already initialized or not a file input
+                if (dropzoneInstances[id] || input.type !== 'file') return;
                 
-                if (!visualContainer) return;
+                // Don't replace signature canvas (though it shouldn't be matched anyway)
+                if (id === 'signature-canvas') return;
 
-                // Remove any existing previews or badges in this container
-                visualContainer.querySelectorAll('.relative.w-full, .file-name-badge').forEach(el => el.remove());
+                const label = input.closest('label');
+                const placementTarget = label || input;
+                
+                // Create Dropzone div
+                const dzDiv = document.createElement('div');
+                dzDiv.id = `dz-container-${id}`;
+                dzDiv.className = 'dropzone w-full transition-all duration-200';
+                dzDiv.setAttribute('data-target-id', id);
 
-                if (input.files && input.files.length > 0) {
-                    const file = input.files[0];
-                    const isImage = file.type.startsWith('image/');
-
-                    if (isImage) {
-                        // Hide the dashed label box
-                        if (uploadLabel) uploadLabel.classList.add('hidden');
-
-                        const reader = new FileReader();
-                        reader.onload = function(event) {
-                            // Clear again to prevent duplicates if user clicks fast
-                            visualContainer.querySelectorAll('.relative.w-full, .file-name-badge').forEach(el => el.remove());
-
-                            const previewHtml = `
-                                <div class="relative w-full">
-                                    <div class="flex flex-col items-center">
-                                        <img src="${event.target.result}" alt="Preview" class="h-40 object-contain rounded-md mb-2 border border-slate-200 bg-white shadow-sm">
-                                        <button class="change-img-btn inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border shadow-sm hover:bg-accent hover:text-accent-foreground h-8 rounded-md px-3 text-xs bg-slate-50" 
-                                                type="button">
-                                            Change Image
-                                        </button>
-                                    </div>
-                                </div>
-                            `;
-                            visualContainer.insertAdjacentHTML('beforeend', previewHtml);
-
-                            // Setup Change Image button
-                            const changeBtn = visualContainer.querySelector('.change-img-btn');
-                            if (changeBtn) {
-                                changeBtn.onclick = function(ev) {
-                                    ev.preventDefault();
-                                    input.click();
-                                };
-                            }
-                        };
-                        reader.readAsDataURL(file);
-                    } else {
-                        // For non-images (PDF), show the checkbox style
-                        if (uploadLabel) {
-                            uploadLabel.classList.remove('hidden');
-                            const uploadText = uploadLabel.querySelector('.font-semibold');
-                            if (uploadText) {
-                                uploadText.textContent = '✓ File selected';
-                                uploadText.closest('p')?.classList.add('text-indigo-600');
-                                uploadText.closest('p')?.classList.remove('text-slate-500');
-                            }
-                        }
-                        const badge = document.createElement('div');
-                        badge.className = 'file-name-badge mt-2 w-full flex items-center justify-center';
-                        badge.innerHTML = `<div class="w-full px-3 py-2 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800 rounded-md flex items-center justify-center gap-2 text-indigo-700 dark:text-indigo-400 text-sm italic font-medium"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" class="shrink-0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg><span class="truncate max-w-[200px]">${file.name}</span></div>`;
-                        visualContainer.appendChild(badge);
-                    }
+                // Prepare message from original UI
+                let messageHtml = '<div class="dz-message flex flex-col items-center justify-center py-4 px-2 text-center">';
+                if (label) {
+                    const iconArea = label.querySelector('svg')?.outerHTML || '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload w-8 h-8 mb-2 text-slate-400"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" x2="12" y1="3" y2="15"></line></svg>';
+                    const textArea = label.querySelector('p')?.innerHTML || '<span class="font-semibold">Click or drag</span> to upload file';
+                    messageHtml += `<div class="mb-2">${iconArea}</div><div class="text-sm text-slate-500">${textArea}</div>`;
                 } else {
-                    // Cleared state - restore prompt
-                    if (uploadLabel) {
-                        uploadLabel.classList.remove('hidden');
-                        const uploadText = uploadLabel.querySelector('.font-semibold');
-                        if (uploadText) {
-                            uploadText.textContent = 'Click to upload';
-                            uploadText.closest('p')?.classList.add('text-slate-500');
-                            uploadText.closest('p')?.classList.remove('text-indigo-600');
+                    messageHtml += '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload w-8 h-8 mb-2 text-slate-400"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" x2="12" y1="3" y2="15"></line></svg><p class="text-sm font-semibold">Drop file here or click to upload</p>';
+                }
+                messageHtml += '</div>';
+
+                // Insert Dropzone UI
+                placementTarget.insertAdjacentElement('afterend', dzDiv);
+                
+                // Configuration
+                const isMultiple = name.includes('[]') || id.includes('certificate') || id.includes('experience');
+                const maxFiles = isMultiple ? 10 : 1;
+                const acceptedFiles = input.accept || ".jpeg,.jpg,.png,.pdf";
+
+                try {
+                    const dz = new Dropzone(dzDiv, {
+                        url: "/file-upload-placeholder", // Required but not used for auto-upload
+                        autoProcessQueue: false,
+                        addRemoveLinks: true,
+                        maxFiles: maxFiles,
+                        acceptedFiles: acceptedFiles,
+                        dictDefaultMessage: messageHtml,
+                        dictRemoveFile: "Remove",
+                        maxFilesize: 5,
+                        thumbnailWidth: 120,
+                        thumbnailHeight: 120,
+                        init: function() {
+                            this.on("addedfile", function(file) {
+                                if (maxFiles === 1 && this.files.length > 1) {
+                                    this.removeFile(this.files[0]);
+                                }
+                                clearErrorForField(id);
+                            });
+                            this.on("error", function(file, message) {
+                                if (typeof message === 'string' && !message.includes('upload center')) {
+                                    Swal.fire({ icon: 'error', title: 'Upload Issue', text: message });
+                                    this.removeFile(file);
+                                }
+                            });
                         }
-                    }
+                    });
+
+                    // Successfully initialized: Hide original
+                    if (label) label.classList.add('hidden');
+                    input.classList.add('hidden');
+                    dropzoneInstances[id] = dz;
+                } catch (err) {
+                    console.error('Dropzone init failed for:', id, err);
+                    dzDiv.remove(); // Cleanup failed UI
                 }
             });
         }
@@ -1549,10 +1569,16 @@
             
             // Red border on input or its visual counterpart
             if (inputEl.type === 'file') {
-                const visualLabel = container.querySelector('label[for="' + inputEl.id + '"]') || inputEl.closest('label');
-                if (visualLabel) {
-                    visualLabel.classList.remove('border-slate-300');
-                    visualLabel.classList.add('border-red-500');
+                const dzDiv = document.getElementById('dz-' + inputEl.id);
+                if (dzDiv) {
+                    dzDiv.style.borderColor = '#ef4444';
+                    dzDiv.style.backgroundColor = '#fef2f2';
+                } else {
+                    const visualLabel = container.querySelector('label[for="' + inputEl.id + '"]') || inputEl.closest('label');
+                    if (visualLabel) {
+                        visualLabel.classList.remove('border-slate-300');
+                        visualLabel.classList.add('border-red-500');
+                    }
                 }
             } else if (inputEl.tagName === 'INPUT' || inputEl.tagName === 'SELECT') {
                 inputEl.classList.remove('border-slate-200', 'focus-visible:ring-indigo-500');
@@ -1587,6 +1613,12 @@
                 container.querySelectorAll('label.text-red-500').forEach(l => l.classList.remove('text-red-500'));
                 
                 if (el.type === 'file') {
+                    // Clear Dropzone visual error
+                    const dzDiv = document.getElementById('dz-' + el.id);
+                    if (dzDiv) {
+                        dzDiv.style.borderColor = '#cbd5e1';
+                        dzDiv.style.backgroundColor = '#f8fafc';
+                    }
                     // Find the visual upload label (dashed box)
                     const visualLabel = container.querySelector('label[for="' + el.id + '"]') || el.closest('label');
                     if (visualLabel) {
@@ -1642,8 +1674,8 @@
         document.addEventListener('DOMContentLoaded', () => {
             // Init phone inputs with country codes
             initPhoneInputs();
-            // Init file name display
-            initFileNameDisplay();
+            // Init Dropzones
+            initDropzones();
 
             // ==============================
             // Make Radix-style Checkboxes work
@@ -2073,7 +2105,12 @@
                     if (docKey === 'signature') return; // handled above
 
                     const fileInput = docEl.querySelector('input[type="file"]');
-                    if (fileInput && fileInput.files.length === 0) {
+                    if (!fileInput) return;
+                    
+                    const dz = dropzoneInstances[fileInput.id];
+                    const hasFiles = dz ? dz.files.length > 0 : fileInput.files.length > 0;
+                    
+                    if (!hasFiles) {
                         showFieldError(fileInput, 'This document is required.');
                         if (!firstMissingDocEl) firstMissingDocEl = docEl;
                     }
@@ -2097,6 +2134,21 @@
                 syncPhoneHidden('emergency');
 
                 const formData = new FormData(form);
+
+                // Add Dropzone files to formData
+                Object.keys(dropzoneInstances).forEach(id => {
+                    const dz = dropzoneInstances[id];
+                    const input = document.getElementById(id);
+                    const name = input.name;
+                    
+                    // Remove existing file entries from formData if any (new FormData includes them if they are in the form)
+                    formData.delete(name);
+                    
+                    // Add files from Dropzone
+                    dz.getQueuedFiles().concat(dz.getAcceptedFiles()).forEach(file => {
+                        formData.append(name, file);
+                    });
+                });
 
                 // Ensure signature data is included (drawn signature)
                 const sigDataVal = document.getElementById('signature-data').value;
@@ -2132,15 +2184,12 @@
         // Clear drawn signature if any
         clearSignature();
 
-        // Clear file name badges
-        document.querySelectorAll('.file-name-badge').forEach(el => el.remove());
+        // Clear file names and Dropzones
+        Object.keys(dropzoneInstances).forEach(id => {
+            dropzoneInstances[id].removeAllFiles();
+        });
         document.querySelectorAll('input[type="file"]').forEach(input => {
             input.value = '';
-            const uploadText = input.closest('label')?.querySelector('.font-semibold');
-            if (uploadText && uploadText.textContent.includes('✓')) {
-                uploadText.textContent = 'Click to upload file';
-                uploadText.closest('p').classList.remove('text-indigo-600');
-            }
         });
 
         // Reset Step 1 section visibility
