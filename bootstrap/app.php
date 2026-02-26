@@ -14,6 +14,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin.auth' => \App\Http\Middleware\AdminAuthenticate::class,
         ]);
+
+        $middleware->redirectUsersTo(fn() => route('admin.dashboard'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

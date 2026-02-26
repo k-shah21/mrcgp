@@ -1790,11 +1790,11 @@
                     const passportVal = document.getElementById('step1-passportNumber').value.trim();
                     if (!passportVal) step1Errors['passportNumber'] = ['Passport Number is required'];
 
-                    if (currentCandidateType === 'old') {
-                        const candId = document.getElementById('step1-candidateId').value.trim();
-                        if (!candId) step1Errors['candidateId'] = ['Candidate ID is required'];
-                        else if (candId.length !== 7) step1Errors['candidateId'] = ['Candidate ID must be 7 digits'];
-                    }
+                    // if (currentCandidateType === 'old') {
+                    //     const candId = document.getElementById('step1-candidateId').value.trim();
+                    //     if (!candId) step1Errors['candidateId'] = ['Candidate ID is required'];
+                    //     else if (candId.length !== 7) step1Errors['candidateId'] = ['Candidate ID must be 7 digits'];
+                    // }
 
                     if (Object.keys(step1Errors).length > 0) {
                         Swal.fire({
@@ -2045,7 +2045,37 @@
                             text: resp.message || 'Your application has been submitted successfully.',
                             confirmButtonColor: '#6366f1',
                         }).then(() => {
-                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                            // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        // Clear Step 2 form fields
+        form.reset();
+
+        // Clear drawn signature if any
+        clearSignature();
+
+        // Clear file name badges
+        document.querySelectorAll('.file-name-badge').forEach(el => el.remove());
+        document.querySelectorAll('input[type="file"]').forEach(input => {
+            input.value = '';
+            const uploadText = input.closest('label')?.querySelector('.font-semibold');
+            if (uploadText && uploadText.textContent.includes('✓')) {
+                uploadText.textContent = 'Click to upload file';
+                uploadText.closest('p').classList.remove('text-indigo-600');
+            }
+        });
+
+        // Reset Step 1 section visibility
+        const step1 = document.getElementById('step-1');
+        const step2 = document.getElementById('step-2');
+        if (step1 && step2) {
+            step2.classList.add('hidden');
+            step1.classList.remove('hidden');
+            step1.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Reset candidate type to default ('new')
+        handleCandidateTypeChange('new', document.querySelector('.cand-type-wrapper[data-target="radio-new"]')); 
                         });
                     },
                     error: function(xhr) {

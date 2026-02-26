@@ -15,8 +15,8 @@ class AdminAuthController extends Controller
     public function showLogin()
     {
         // Already logged in — redirect to dashboard
-        if (session('admin_logged_in')) {
-            return redirect()->route('admin.applications.index');
+        if (\Illuminate\Support\Facades\Auth::check() || session('admin_logged_in')) {
+            return redirect()->route('admin.dashboard');
         }
 
         return view('admin.auth.login');
@@ -34,17 +34,8 @@ class AdminAuthController extends Controller
             'email'    => 'required|email',
             'password' => 'required|string|min:6',
         ]);
-        
-       
 
-        // $adminEmail    = config('admin.email');
-        // $adminPassword = config('admin.password');
-
-        $emailMatches    = hash_equals($request->email, $request->email);
-        $passwordMatches = Hash::check($request->password, $request->password);
-
-
-        if ($emailMatches && $passwordMatches) {
+        if (\Illuminate\Support\Facades\Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             // Regenerate session to prevent session fixation
             $request->session()->regenerate();
 
@@ -56,7 +47,7 @@ class AdminAuthController extends Controller
 
             Log::info('Admin login successful', ['email' => $request->email, 'ip' => $request->ip()]);
 
-            return redirect()->route('admin.applications.index')
+            return redirect()->route('admin.dashboard')
                 ->with('success', 'Welcome back, Admin!');
         }
 
@@ -74,6 +65,7 @@ class AdminAuthController extends Controller
     {
         Log::info('Admin logout', ['email' => session('admin_email'), 'ip' => $request->ip()]);
 
+        \Illuminate\Support\Facades\Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

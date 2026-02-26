@@ -88,8 +88,7 @@ class Application extends Model
         return $query->where(function ($q) use ($search) {
             $q->where('usualForename', 'like', "%{$search}%")
               ->orWhere('lastName', 'like', "%{$search}%")
-              ->orWhere('email', 'like', "%{$search}%")
-              ->orWhere('candidateId', 'like', "%{$search}%")
+                ->orWhere('email', 'like', "%{$search}%")
               ->orWhere('passportNumber', 'like', "%{$search}%");
         });
     }

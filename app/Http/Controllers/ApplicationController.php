@@ -8,6 +8,7 @@ use App\Mail\ApplicationReceived;
 use App\Mail\ApplicationRejected;
 use App\Mail\ApplicationStatusChanged;
 use App\Models\Application;
+use App\Models\OldCandidate;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -29,56 +30,57 @@ class ApplicationController extends Controller
 
         // ── Old candidate: verify candidateId exists ────────────
         if ($type === 'old') {
-            $existing = Application::where('candidateId', $request->candidateId)->first();
+            $existing = OldCandidate::where('candidate_id', $request->candidateId)
+                ->first();
 
-            if (! $existing) {
+            if (!$existing) {
                 return response()->json([
-                    'status'  => 'error',
-                    'errors'  => ['candidateId' => ['Candidate ID not found. Please check your ID.']],
+                    'status' => 'error',
+                    'errors' => ['candidateId' => ['We could not find an old candidate matching this ID. Please double check the ID and try again.']],
                 ], 422);
             }
 
             // Passport must match
-            if ($existing->passportNumber !== $request->passportNumber) {
-                return response()->json([
-                    'status'  => 'error',
-                    'errors'  => ['passportNumber' => ['Passport number does not match the candidate record.']],
-                ], 422);
-            }
+            // if ($existing->passportNumber !== $request->passportNumber) {
+            //     return response()->json([
+            //         'status' => 'error',
+            //         'errors' => ['passportNumber' => ['Passport number does not match the candidate record.']],
+            //     ], 422);
+            // }
 
             return response()->json([
-                'status'  => 'success',
+                'status' => 'success',
                 'message' => 'Candidate verified. Please proceed to complete your application.',
-                'data'    => [
+                'data' => [
                     'usualForename' => $existing->usualForename,
-                    'lastName'      => $existing->lastName,
-                    'email'         => $existing->email,
+                    'lastName' => $existing->lastName,
+                    'email' => $existing->email,
                 ],
             ]);
         }
 
         // ── New candidate: duplicate check ──────────────────────
-        $emailExists    = Application::where('email', $request->email)->exists();
+        $emailExists = Application::where('email', $request->email)->exists();
         $passportExists = Application::where('passportNumber', $request->passportNumber)->exists();
 
         if ($emailExists || $passportExists) {
             $errors = [];
             if ($emailExists) {
-                $errors['email'] = ['This email address has already been used for an application.'];
+                $errors['email'] = ['The email address you entered is already associated with an existing application. Please check your email for status updates, or use a different email address if this is a mistake.'];
             }
             if ($passportExists) {
-                $errors['passportNumber'] = ['This passport number has already been used for an application.'];
+                $errors['passportNumber'] = ['The passport number you entered is already registered in our system. Only one application per passport is permitted. Please verify your passport details and try again.'];
             }
 
             return response()->json([
-                'status'  => 'duplicate',
-                'message' => 'A duplicate application was detected.',
-                'errors'  => $errors,
+                'status' => 'duplicate',
+                'message' => 'We detected that you may have already submitted an application.',
+                'errors' => $errors,
             ], 409);
         }
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Eligibility Confirmed! You can proceed to complete your application.',
         ]);
     }
@@ -95,8 +97,8 @@ class ApplicationController extends Controller
         }
         if ($existingQuery->exists()) {
             return response()->json([
-                'status'  => 'duplicate',
-                'message' => 'A duplicate application was detected. Submission rejected.',
+                'status' => 'duplicate',
+                'message' => 'It looks like this application has already been submitted. We have stopped this request to prevent duplicate entries.',
             ], 409);
         }
 
@@ -160,12 +162,12 @@ class ApplicationController extends Controller
                 }
                 $otherDocs['internship_certificates'] = $internPaths;
             }
-            if (! empty($otherDocs)) {
+            if (!empty($otherDocs)) {
                 $data['otherDocumentsPaths'] = json_encode($otherDocs);
             }
 
             $data['termsAccepted'] = $request->has('termsAccepted');
-            $data['status']        = 'pending';
+            $data['status'] = 'pending';
 
             // Build fullName — form sends 'fullNameOnRecord', stored as 'fullName'
             $data['fullName'] = $request->filled('fullNameOnRecord')
@@ -174,6 +176,13 @@ class ApplicationController extends Controller
 
             // Remove the form field alias to avoid mass-assignment confusion
             unset($data['fullNameOnRecord']);
+
+            // Provide a default for eligibilityCriterion if left blank (for old candidates)
+            if ($request->candidateType === 'old' && empty($data['eligibilityCriterion'])) {
+                $data['eligibilityCriterion'] = 'N/A';
+            }
+
+            // dd($request->all());
 
             $application = Application::create($data);
 
@@ -187,13 +196,14 @@ class ApplicationController extends Controller
                 } catch (\Exception $mailEx) {
                     Log::error('Failed to send ApplicationReceived email', [
                         'application_id' => $application->id,
-                        'error'          => $mailEx->getMessage(),
+                        'error' => $mailEx->getMessage(),
                     ]);
                 }
             }
 
             return response()->json([
-                'status'  => 'success',
+                'status' => 'success',
+                'redirect' => '/',
                 'message' => 'Application submitted successfully! You will receive a confirmation email shortly.',
             ]);
         } catch (\Exception $e) {
@@ -205,8 +215,8 @@ class ApplicationController extends Controller
             ]);
 
             return response()->json([
-                'status'  => 'error',
-                'message' => 'An error occurred while processing your application. Please try again.',
+                'status' => 'error',
+                'message' => 'We experienced a temporary issue while processing your application. No data was saved. Please wait a moment and try submitting again. If the issue persists, contact our support team.',
             ], 500);
         }
     }
@@ -222,18 +232,18 @@ class ApplicationController extends Controller
     {
         $search = $request->input('search');
         $status = $request->input('status');
-        $type   = $request->input('type');
+        $type = $request->input('type');
 
         $query = Application::query()
             ->search($search)
-            ->when($status, fn ($q, $s) => $q->where('status', $s))
-            ->when($type, fn ($q, $t)   => $q->where('candidateType', $t))
+            ->when($status, fn($q, $s) => $q->where('status', $s))
+            ->when($type, fn($q, $t) => $q->where('candidateType', $t))
             ->latest();
 
         // Stats
         $stats = [
-            'total'    => Application::count(),
-            'pending'  => Application::pending()->count(),
+            'total' => Application::count(),
+            'pending' => Application::pending()->count(),
             'approved' => Application::approved()->count(),
             'rejected' => Application::rejected()->count(),
         ];
@@ -259,8 +269,13 @@ class ApplicationController extends Controller
         $applications = $query->paginate(15)->withQueryString();
 
         return view('admin.applications.index', compact(
-            'applications', 'stats', 'search', 'status', 'type',
-            'timeChartData', 'statusChartData'
+            'applications',
+            'stats',
+            'search',
+            'status',
+            'type',
+            'timeChartData',
+            'statusChartData'
         ));
     }
 
@@ -278,12 +293,12 @@ class ApplicationController extends Controller
     public function updateStatus(Request $request, Application $application): \Illuminate\Http\RedirectResponse
     {
         $request->validate([
-            'status'        => 'required|in:approved,rejected,pending',
+            'status' => 'required|in:approved,rejected,pending',
             'admin_message' => 'nullable|string|max:2000',
         ]);
 
         $application->update([
-            'status'        => $request->status,
+            'status' => $request->status,
             'admin_message' => $request->admin_message,
         ]);
 
@@ -302,8 +317,8 @@ class ApplicationController extends Controller
             } catch (\Exception $e) {
                 Log::error('Failed to send status email', [
                     'application_id' => $application->id,
-                    'status'         => $request->status,
-                    'error'          => $e->getMessage(),
+                    'status' => $request->status,
+                    'error' => $e->getMessage(),
                 ]);
             }
         }

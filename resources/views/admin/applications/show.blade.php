@@ -234,71 +234,85 @@
             <x-card title="Status" subtitle="Current application status">
                 <div class="text-center py-4">
                     @php
-                        $variant = match($application->status) {
-                            'approved' => 'success',
-                            'rejected' => 'danger',
-                            default => 'warning',
-                        };
-                        $statusColors = match($application->status) {
-                            'approved' => 'bg-emerald-100 text-emerald-800 ring-emerald-300',
-                            'rejected' => 'bg-rose-100 text-rose-800 ring-rose-300',
-                            default => 'bg-amber-100 text-amber-800 ring-amber-300',
-                        };
+$variant = match ($application->status) {
+    'approved' => 'success',
+    'rejected' => 'danger',
+    default => 'warning',
+};
+$statusColors = match ($application->status) {
+    'approved' => 'bg-emerald-100 text-emerald-800 ring-emerald-300',
+    'rejected' => 'bg-rose-100 text-rose-800 ring-rose-300',
+    default => 'bg-amber-100 text-amber-800 ring-amber-300',
+};
                     @endphp
-                    <span class="inline-flex items-center rounded-full px-4 py-1.5 text-sm font-semibold ring-1 ring-inset {{ $statusColors }}">
-                        {{ ucfirst($application->status ?? 'pending') }}
-                    </span>
-
-                    @if($application->admin_message)
-                        <div class="mt-4 p-3 bg-slate-50 rounded-xl border border-slate-200 text-left">
-                            <p class="text-[11px] uppercase tracking-wide text-slate-400 font-semibold mb-1">Admin Message</p>
-                            <p class="text-xs text-slate-700">{{ $application->admin_message }}</p>
+                        <span
+                            class="inline-flex items-center rounded-full px-4 py-1.5 text-sm font-semibold ring-1 ring-inset {{ $statusColors }}">
+                            {{ ucfirst($application->status ?? 'pending') }}
+                        </span>
+                        
+                        @if($application->admin_message)
+                            <div class="mt-4 p-3 bg-slate-50 rounded-xl border border-slate-200 text-left">
+                                <p class="text-[11px] uppercase tracking-wide text-slate-400 font-semibold mb-1">Admin Message</p>
+                                <p class="text-xs text-slate-700">{{ $application->admin_message }}</p>
+                            </div>
+                        @endif
                         </div>
-                    @endif
-                </div>
-            </x-card>
+                        </x-card>
+                        
+                        {{-- Approve Action --}}
+                        @if($application->status !== 'approved' && $application->status !== 'rejected')
+                            <x-card title="Approve Application" subtitle="Mark as approved">
+                                <form method="POST" action="{{ route('admin.applications.update-status', $application) }}">
+                                    @csrf
+                                    @method('PATCH')
+                                    <input type="hidden" name="status" value="approved">
+                                    <button type="submit"
+                                        class="w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-700 transition shadow-sm"
+                                        onclick="return confirm('Are you sure you want to approve this application?')">
+                                        <i class="ri-check-line text-sm"></i> Approve Application
+                                    </button>
+                                </form>
+                            </x-card>
+                        @endif
+                        
+                        {{-- Reject Action --}}
+                        @if($application->status !== 'rejected' && $application->status !== 'approved')
+                            <x-card title="Reject Application" subtitle="Decline this application">
+                                <!-- Toggle Button at Top Right -->
+                                <div class="absolute top-4 right-2 flex justify-end mb-3">
+                                    <label for="send-email" class="inline-flex items-center cursor-pointer text-xs text-slate-600">
+                                        <span class="mr-2">Send Mail?</span>
+                                        <div class="relative">
+                                            <input type="checkbox" id="send-email" name="send_email" class="sr-only peer">
+                                            <div class="w-9 h-5 bg-slate-300 rounded-full peer-checked:bg-rose-600 transition-all"></div>
+                                            <div
+                                                class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-4 transition-all">
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
 
-            {{-- Approve Action --}}
-            @if($application->status !== 'approved')
-                <x-card title="Approve" subtitle="Mark as approved">
-                    <form method="POST" action="{{ route('admin.applications.update-status', $application) }}">
-                        @csrf
-                        @method('PATCH')
-                        <input type="hidden" name="status" value="approved">
-                        <div class="mb-3">
-                            <label class="block text-[11px] font-semibold uppercase tracking-wide text-slate-500 mb-1">Message (optional)</label>
-                            <textarea name="admin_message" rows="3" placeholder="Congratulations! Your application has been approved..."
-                                class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/70 transition-all"></textarea>
-                        </div>
-                        <button type="submit"
-                            class="w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-700 transition shadow-sm"
-                            onclick="return confirm('Are you sure you want to approve this application?')">
-                            <i class="ri-check-line text-sm"></i> Approve Application
-                        </button>
-                    </form>
-                </x-card>
-            @endif
+                                <form method="POST" action="{{ route('admin.applications.update-status', $application) }}">
+                                    @csrf
+                                    @method('PATCH')
+                                    <input type="hidden" name="status" value="rejected">
 
-            {{-- Reject Action --}}
-            @if($application->status !== 'rejected')
-                <x-card title="Reject" subtitle="Decline this application">
-                    <form method="POST" action="{{ route('admin.applications.update-status', $application) }}">
-                        @csrf
-                        @method('PATCH')
-                        <input type="hidden" name="status" value="rejected">
-                        <div class="mb-3">
-                            <label class="block text-[11px] font-semibold uppercase tracking-wide text-slate-500 mb-1">Reason (optional)</label>
-                            <textarea name="admin_message" rows="3" placeholder="Your application has been rejected because..."
-                                class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/70 transition-all"></textarea>
-                        </div>
-                        <button type="submit"
-                            class="w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-rose-600 px-4 py-2 text-xs font-semibold text-white hover:bg-rose-700 transition shadow-sm"
-                            onclick="return confirm('Are you sure you want to reject this application?')">
-                            <i class="ri-close-line text-sm"></i> Reject Application
-                        </button>
-                    </form>
-                </x-card>
-            @endif
+                                    <div class="mb-3">
+                                        <label class="block text-[11px] font-semibold uppercase tracking-wide text-slate-500 mb-1">
+                                            Reason (optional)
+                                        </label>
+                                        <textarea name="admin_message" rows="3" placeholder="Your application has been rejected because..."
+                                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/70 transition-all"></textarea>
+                                    </div>
+
+                                        <button type="submit"
+                                            class="w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-rose-600 px-4 py-2 text-xs font-semibold text-white hover:bg-rose-700 transition shadow-sm"
+                                            onclick="return confirm('Are you sure you want to reject this application?')">
+                                            <i class="ri-close-line text-sm"></i> Reject Application
+                                        </button>
+                                    </form>
+                                </x-card>
+                        @endif
 
             {{-- Reset to Pending --}}
             @if($application->status !== 'pending')

@@ -65,7 +65,7 @@ class StoreApplicationRequest extends FormRequest
 
         // Old candidate specific rules
         if ($this->input('candidateType') === 'old') {
-            $rules['candidateId']          = 'required|string|size:7|exists:applications,candidateId';
+            $rules['candidateId'] = 'required|string|size:7';
             $rules['eligibilityCriterion'] = 'nullable|string';
             $rules['email']                = 'nullable|email:rfc,dns|max:255';
         }
@@ -76,21 +76,31 @@ class StoreApplicationRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'email.unique'                      => 'This email address has already been used for an application.',
-            'passportNumber.unique'             => 'This passport number has already been used for an application.',
-            'candidateId.exists'                => 'Candidate ID not found. Please check your ID.',
-            'candidateId.size'                  => 'Candidate ID must be exactly 7 characters.',
-            'termsAccepted.accepted'            => 'You must accept the terms and conditions.',
-            'eligibilityCriterion.required'     => 'Please select an eligibility criterion.',
-            'eligibilityCriterion.in'           => 'Invalid eligibility criterion selected.',
-            'passportImage.required'            => 'Passport image is required.',
-            'passport_bio_page.required'        => 'Passport bio page is required.',
-            'valid_license.required'            => 'Valid license document is required.',
-            'mbbs_degree.required'              => 'MBBS degree document is required.',
-            'training_certificate.required'     => 'Training/Diploma certificate is required.',
-            'internship_certificates.required'  => 'At least one internship certificate is required.',
-            'experience_certificates.required'  => 'At least one experience certificate is required.',
-            'examCenterPreference.required'     => 'Please select an examination center.',
+            'email.unique' => 'This email address is already associated with an existing application. Please check your email for updates or supply a different email.',
+            'passportNumber.unique' => 'This passport number is already registered in our system. Only one application per passport is permitted.',
+            'candidateId.size' => 'Your Candidate ID must be exactly 7 characters long. Please check your records and try again.',
+            'termsAccepted.accepted' => 'You must carefully review and accept the Terms and Conditions before proceeding with the application.',
+            'eligibilityCriterion.required' => 'Please select an Eligibility Criterion so we can determine the exact documents required for your application.',
+            'eligibilityCriterion.in' => 'The selected Eligibility Criterion is not recognized. Please choose a valid option (A, B, or C).',
+            'passportImage.required' => 'A clear Passport Size Photograph is mandatory for your application profile. Please upload a profile image file.',
+            'passportImage.image' => 'The uploaded file for the Passport Image must be a valid image format (e.g., jpeg, png, jpg).',
+            'passportImage.max' => 'The Passport Image file size must not exceed 5MB. Please compress the image and try again.',
+            'passport_bio_page.required' => 'The Bio-data Page of your Passport is required to verify your identity. Please ensure you upload a clear, legible copy.',
+            'passport_bio_page.max' => 'The Passport Bio-data Page file size must not exceed 5MB.',
+            'valid_license.required' => 'A Valid Medical License document is mandatory. Please provide a copy in jpeg, png, jpg, or pdf format.',
+            'valid_license.max' => 'The Medical License file size must not exceed 3MB.',
+            'mbbs_degree.required' => 'Your MBBS Degree Certificate is required to confirm your foundational medical qualifications.',
+            'training_certificate.required' => 'A valid Training or Diploma certificate is required based on your selected Eligibility Criterion.',
+            'internship_certificates.required' => 'Please upload your Internship Certificates. At least one document is required to prove your applied training.',
+            'experience_certificates.required' => 'Please upload your Experience Certificates. These are required for your selected Eligibility Criterion.',
+            'examCenterPreference.required' => 'You must select a preferred Examination Center to help us schedule your assessment correctly.',
+            'whatsappNumber.required' => 'Your WhatsApp Number is required for potential immediate communications.',
+            'emergencyContactNumber.required' => 'An Emergency Contact Number is mandatory in case we need to reach someone on your behalf urgently.',
+            'poBox.required' => 'Please provide your current P.O. Box or primary address line.',
+            'city.required' => 'Please provide the City for your current residence.',
+            'country.required' => 'Please provide the Country of your current residence.',
+            'schoolName.required' => 'The name of your Medical School is required to verify your educational background.',
+            'qualificationYear.numeric' => 'The Qualification Year must be a valid numeric year.',
         ];
     }
 }
