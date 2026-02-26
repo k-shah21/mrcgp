@@ -34,13 +34,14 @@
         .dropzone.dz-drag-hover { background: #eef2ff !important; border-color: #6366f1 !important; }
         .dropzone.dz-started .dz-message { display: none !important; }
         .dropzone .dz-message { margin: 0 !important; font-family: inherit !important; color: #64748b !important; }
-        .dropzone .dz-preview { margin: 0 !important; min-height: unset !important; }
-        .dropzone .dz-preview .dz-image { border-radius: 0.375rem !important; width: 100px !important; height: 100px !important; }
-        .dropzone .dz-preview .dz-details { padding: 0.5rem !important; opacity: 0 !important; transition: opacity 0.2s !important; }
-        .dropzone .dz-preview:hover .dz-details { opacity: 1 !important; }
-        .dropzone .dz-preview .dz-remove { color: #ef4444 !important; font-weight: 500 !important; font-size: 0.75rem !important; text-decoration: none !important; margin-top: 0.25rem !important; display: block !important; border: 1px solid #fee2e2 !important; border-radius: 0.25rem !important; padding: 2px 4px !important; background: #fff !important; }
-        .dropzone .dz-preview .dz-remove:hover { background: #fee2e2 !important; }
-        .dropzone .dz-error-message { top: 110px !important; }
+        .dropzone .dz-preview .dz-actions { position: absolute; top: 8px; right: 8px; display: flex; gap: 6px; z-index: 50; opacity: 0; transition: all 0.2s ease; }
+        .dropzone .dz-preview:hover .dz-actions { opacity: 1; transform: translateY(0); }
+        .dz-action-btn { background: white; border: 1px solid #e2e8f0; border-radius: 6px; width: 32px; height: 32px; color: #475569; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .dz-action-btn:hover { color: #6366f1; border-color: #6366f1; transform: scale(1.1); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .dz-action-btn.btn-remove:hover { color: #ef4444; border-color: #ef4444; background: #fef2f2; }
+        .dropzone .dz-preview .dz-image { border-radius: 0.75rem !important; overflow: hidden !important; border: 1px solid #e2e8f0 !important; }
+        .dropzone .dz-preview .dz-remove { display: none !important; } 
+        .dropzone .dz-error-message { top: 120px !important; background: #ef4444 !important; color: white !important; border-radius: 4px !important; padding: 4px 8px !important; }
     </style>
 </head>
 
@@ -1466,22 +1467,101 @@
 
                 try {
                     const dz = new Dropzone(dzDiv, {
-                        url: "/file-upload-placeholder", // Required but not used for auto-upload
+                        url: "/file-upload-placeholder",
                         autoProcessQueue: false,
-                        addRemoveLinks: true,
+                        addRemoveLinks: false, // We're using custom actions
                         maxFiles: maxFiles,
                         acceptedFiles: acceptedFiles,
                         dictDefaultMessage: messageHtml,
-                        dictRemoveFile: "Remove",
                         maxFilesize: 5,
-                        thumbnailWidth: 120,
-                        thumbnailHeight: 120,
+                        thumbnailWidth: 200,
+                        thumbnailHeight: 200,
+                        previewTemplate: `
+                            <div class="dz-preview dz-file-preview relative group">
+                                <div class="dz-image overflow-hidden">
+                                    <img data-dz-thumbnail class="object-cover w-full h-full" />
+                                </div>
+                                <div class="dz-actions">
+                                    <button type="button" class="dz-action-btn btn-view" title="View">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    </button>
+                                    <button type="button" class="dz-action-btn btn-edit" title="Replace">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                                    </button>
+                                    <button type="button" class="dz-action-btn btn-remove" title="Remove">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                                    </button>
+                                </div>
+                                <div class="dz-details absolute bottom-0 left-0 right-0 p-2 bg-black/50 text-white text-[10px] opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <div class="dz-filename truncate" data-dz-name></div>
+                                    <div class="dz-size" data-dz-size></div>
+                                </div>
+                                <div class="dz-error-message text-red-500 text-[10px] absolute -bottom-5 left-0" data-dz-errormessage></div>
+                            </div>
+                        `,
                         init: function() {
+                            const self = this;
+                            
                             this.on("addedfile", function(file) {
-                                if (maxFiles === 1 && this.files.length > 1) {
-                                    this.removeFile(this.files[0]);
+                                if (maxFiles === 1 && self.files.length > 1) {
+                                    self.removeFile(self.files[0]);
                                 }
                                 clearErrorForField(id);
+                                
+                                // Shared behavior for view/replace
+                                const setupActions = (f) => {
+                                    const previewEl = f.previewElement;
+                                    if (!previewEl) return;
+
+                                    // View handler
+                                    const viewBtn = previewEl.querySelector('.btn-view');
+                                    if (viewBtn) {
+                                        viewBtn.onclick = function(e) {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            const url = f.dataURL || (f.previewElement.querySelector('img') ? f.previewElement.querySelector('img').src : null);
+                                            if (url && (f.type.match(/image.*/) || url.startsWith('data:image'))) {
+                                                Swal.fire({
+                                                    imageUrl: url,
+                                                    imageAlt: f.name,
+                                                    showCloseButton: true,
+                                                    showConfirmButton: false,
+                                                    width: 'auto',
+                                                    padding: '10px',
+                                                    background: '#fff',
+                                                    customClass: { image: 'rounded-lg max-h-[85vh] shadow-lg' }
+                                                });
+                                            } else {
+                                                Swal.fire({ title: f.name, text: 'No preview available for this file type.', icon: 'info' });
+                                            }
+                                        };
+                                    }
+
+                                    // Edit handler (Replace)
+                                    const editBtn = previewEl.querySelector('.btn-edit');
+                                    if (editBtn) {
+                                        editBtn.onclick = function(e) {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            self.removeFile(f);
+                                            dzDiv.click(); // Standard way to trigger dropzone picker
+                                        };
+                                    }
+
+                                    // Remove handler
+                                    const removeBtn = previewEl.querySelector('.btn-remove');
+                                    if (removeBtn) {
+                                        removeBtn.onclick = function(e) {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            self.removeFile(f);
+                                        };
+                                    }
+                                };
+
+                                // Some events trigger before previewElement is fully ready
+                                if (file.previewElement) setupActions(file);
+                                else this.on("thumbnail", function(f) { setupActions(f); });
                             });
                             this.on("error", function(file, message) {
                                 if (typeof message === 'string' && !message.includes('upload center')) {
