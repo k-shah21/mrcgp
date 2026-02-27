@@ -1,4 +1,4 @@
-<x-layouts.guest-layout title="Admin Login – MRCGP Portal">
+<x-layouts.guest title="Admin Login – MRCGP Portal">
 
     <!-- Header -->
     <div class="text-center mb-8">
@@ -12,14 +12,10 @@
     <!-- Card -->
     <div class="glass-card rounded-2xl p-8 shadow-2xl">
 
-        <!-- Session Status -->
-        @if (session('status'))
-            <div class="mb-4 text-green-400 text-sm">
-                {{ session('status') }}
-            </div>
-        @endif
+        <!-- Status -->
+        <x-auth-session-status class="mb-4 text-green-400 text-sm" :status="session('status')" />
 
-        <!-- Validation Errors -->
+        <!-- Errors -->
         @if ($errors->any())
             <div class="mb-5 bg-red-500/20 border border-red-400/30 rounded-xl px-4 py-3">
                 <ul class="text-red-300 text-sm space-y-1">
@@ -45,7 +41,7 @@
                         required
                         autofocus
                         autocomplete="username"
-                        placeholder="admin@complyeze.com"
+                        placeholder="admin@example.com"
                         class="w-full pl-10 pr-4 py-2.5 bg-white/10 border border-white/20 rounded-xl text-white placeholder-indigo-300/60 text-sm focus:border-indigo-400 focus:bg-white/15 transition"
                     >
                 </div>
@@ -82,15 +78,15 @@
             <!-- Submit -->
             <button type="submit"
                 class="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold text-sm transition-all duration-200 transform hover:scale-[1.02] shadow-lg">
-                Sign In to Dashboard
+                Sign In
             </button>
 
-            <!-- Forgot Password -->
+            <!-- Forgot Password
             @if (Route::has('password.request'))
                 <p class="mt-3 text-sm text-indigo-300 text-center">
                     <a href="{{ route('password.request') }}" class="underline hover:text-white">Forgot your password?</a>
                 </p>
-            @endif
+            @endif -->
 
         </form>
     </div>
@@ -99,4 +95,17 @@
         © {{ date('Y') }} South Asia MRCGP [INT] Examination Board
     </p>
 
-</x-layouts.guest-layout>
+    <script>
+        document.getElementById('toggle-pw')?.addEventListener('click', function () {
+            const pw = document.getElementById('password');
+            const icon = document.getElementById('eye-icon');
+            if (pw.type === 'password') {
+                pw.type = 'text';
+                icon.className = 'ri-eye-off-line text-lg';
+            } else {
+                pw.type = 'password';
+                icon.className = 'ri-eye-line text-lg';
+            }
+        });
+    </script>
+</x-layouts.guest>

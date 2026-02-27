@@ -1,4 +1,4 @@
-<x-layouts.guest-layout title="Forgot Password – MRCGP Portal">
+<x-layouts.guest title="Forgot Password – MRCGP Portal">
 
     <!-- Header -->
     <div class="text-center mb-8">
@@ -61,4 +61,4 @@
         © {{ date('Y') }} South Asia MRCGP [INT] Examination Board
     </p>
 
-</x-layouts.guest-layout>
+</x-layouts.guest>
