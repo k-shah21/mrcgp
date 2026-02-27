@@ -80,9 +80,11 @@
                         <th
                             class="border-b border-slate-100 bg-slate-50/80 text-[11px] uppercase tracking-[0.16em] text-slate-500 font-semibold px-4 py-3">
                             Status</th>
-                        <th
-                            class="border-b border-slate-100 bg-slate-50/80 text-[11px] uppercase tracking-[0.16em] text-slate-500 font-semibold px-4 py-3">
-                            Handled By</th>
+                        @if (auth()->check() && auth()->user()->isAdmin())
+                            <th
+                                class="border-b border-slate-100 bg-slate-50/80 text-[11px] uppercase tracking-[0.16em] text-slate-500 font-semibold px-4 py-3">
+                                Handled By</th>
+                        @endif
                         <th
                             class="border-b border-slate-100 bg-slate-50/80 text-[11px] uppercase tracking-[0.16em] text-slate-500 font-semibold px-4 py-3">
                             Date</th>
@@ -120,9 +122,11 @@
                                     {{ ucfirst($app->status ?? 'pending') }}
                                 </x-badge>
                             </td>
-                            <td class="border-b border-slate-100 px-4 py-3 text-xs text-slate-500">
-                                {{ $app->handledBy?->name ?? '—' }}
-                            </td>
+                            @if (auth()->check() && auth()->user()->isAdmin())
+                                <td class="border-b border-slate-100 px-4 py-3 text-xs text-slate-500">
+                                    {{ $app->handledBy?->name ?? '—' }}
+                                </td>
+                            @endif
                             <td class="border-b border-slate-100 px-4 py-3 text-xs text-slate-500">
                                 {{ $app->created_at?->format('M d, Y') }}
                             </td>

@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ $title ?? 'Admin' }} | MRCGP Admin</title>
+    <title>{{ $title ?? 'Admin' }} | MRCGP</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     {{-- Fonts --}}
@@ -33,12 +33,9 @@
             class="hidden md:flex md:flex-col w-64 shrink-0 bg-slate-950 text-slate-100 border-r border-slate-800 sticky top-0 h-screen overflow-hidden self-start">
             <div class="flex h-16 items-center px-5 border-b border-slate-800/80">
                 <div class="flex items-center gap-x-3">
-                    <div
-                        class="h-9 w-9 rounded-2xl bg-indigo-500 text-white flex items-center justify-center text-sm font-semibold shadow-sm">
-                        MRC
-                    </div>
+                   <img src="{{asset('icon.png')}}" class="w-10 h-10 object-contain" alt="">
                     <div>
-                        <p class="text-sm font-semibold tracking-tight">MRCGP Admin</p>
+                        <p class="text-sm font-semibold tracking-tight">MRCGP</p>
                         <p class="text-[11px] text-slate-400">Application Portal</p>
                     </div>
                 </div>
@@ -46,20 +43,25 @@
 
             <nav class="mt-4 flex-1 px-3 space-y-1 overflow-y-auto">
                 @php
-                    $navItems = [
-                        [
+                    $navItems = [];
+
+                    // Admin-only nav items
+                    if (auth()->check() && auth()->user()->isAdmin()) {
+                        $navItems[] = [
                             'label' => 'Dashboard',
                             'icon' => 'ri-dashboard-3-line',
                             'route' => 'admin.dashboard',
-                        ],
-                        [
-                            'label' => 'Applications',
-                            'icon' => 'ri-file-list-3-line',
-                            'route' => 'admin.applications.index',
-                        ],
+                        ];
+                    }
+
+                    // Applications (Visible to both Admin and Staff)
+                    $navItems[] = [
+                        'label' => 'Applications',
+                        'icon' => 'ri-file-list-3-line',
+                        'route' => 'admin.applications.index',
                     ];
 
-                    // Admin-only nav items
+                    // Staff Management (Admin Only)
                     if (auth()->check() && auth()->user()->isAdmin()) {
                         $navItems[] = [
                             'label' => 'Staff',

@@ -63,7 +63,10 @@ class AdminAuthController extends Controller
 
             Log::info('Admin login successful', ['email' => $request->email, 'role' => $user->role, 'ip' => $request->ip()]);
 
-            return redirect()->route('admin.dashboard')
+            // Determine redirect route based on role
+            $redirectRoute = $user->isAdmin() ? 'admin.dashboard' : 'admin.applications.index';
+
+            return redirect()->route($redirectRoute)
                 ->with('success', "Welcome back, {$user->name}!");
         }
 

@@ -1,23 +1,22 @@
-<x-layouts.guest-layout title="Register – MRCGP Portal">
+<x-layouts.guest title="Register – MRCGP Portal">
 
-    <!-- Header -->
+      <!-- Header -->
     <div class="text-center mb-8">
-        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/10 border border-white/20 mb-4 shadow-lg">
-            <span class="text-white font-bold text-xl">MRC</span>
+        <div class="mb-5 flex justify-center">
+            <img src="/logo-2.png" class="w-32 sm:w-72 object-contain drop-shadow-md" alt="MRCGP">
         </div>
-        <h1 class="text-2xl font-bold text-white tracking-tight">MRCGP Registration</h1>
-        <p class="text-indigo-300 text-sm mt-1">Create a new account to access the portal</p>
     </div>
 
     <!-- Card -->
-    <div class="glass-card rounded-2xl p-8 shadow-2xl">
-
+    <div class="glass-card rounded-2xl p-8 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
+<h2 class="text-2xl font-extrabold text-slate-800 tracking-tight">Register</h2>
         <!-- Validation Errors -->
         @if ($errors->any())
-            <div class="mb-5 bg-red-500/20 border border-red-400/30 rounded-xl px-4 py-3">
-                <ul class="text-red-300 text-sm space-y-1">
+            <div class="mb-5 bg-red-50 border border-red-100 rounded-xl px-4 py-3">
+                <ul class="text-red-600 text-sm space-y-1 font-medium">
                     @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
+                        <li><i class="ri-error-warning-line mr-1"></i> {{ $error }}</li>
                     @endforeach
                 </ul>
             </div>
@@ -28,25 +27,28 @@
 
             <!-- Name -->
             <div>
-                <label class="block text-sm font-medium text-indigo-200 mb-2">Name</label>
-                <input
-                    id="name"
-                    type="text"
-                    name="name"
-                    value="{{ old('name') }}"
-                    required
-                    autofocus
-                    autocomplete="name"
-                    placeholder="Your Name"
-                    class="w-full pl-3 pr-4 py-2.5 bg-white/10 border border-white/20 rounded-xl text-white placeholder-indigo-300/60 text-sm focus:border-indigo-400 focus:bg-white/15 transition"
-                >
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Full Name</label>
+                <div class="relative">
+                    <i class="ri-user-line absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg"></i>
+                    <input
+                        id="name"
+                        type="text"
+                        name="name"
+                        value="{{ old('name') }}"
+                        required
+                        autofocus
+                        autocomplete="name"
+                        placeholder="Dr. John Doe"
+                        class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none"
+                    >
+                </div>
             </div>
 
             <!-- Email -->
             <div>
-                <label class="block text-sm font-medium text-indigo-200 mb-2">Email Address</label>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Email Address</label>
                 <div class="relative">
-                    <i class="ri-mail-line absolute left-3.5 top-1/2 -translate-y-1/2 text-indigo-400 text-lg"></i>
+                    <i class="ri-mail-line absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg"></i>
                     <input
                         id="email"
                         type="email"
@@ -54,17 +56,17 @@
                         value="{{ old('email') }}"
                         required
                         autocomplete="username"
-                        placeholder="admin@complyeze.com"
-                        class="w-full pl-10 pr-4 py-2.5 bg-white/10 border border-white/20 rounded-xl text-white placeholder-indigo-300/60 text-sm focus:border-indigo-400 focus:bg-white/15 transition"
+                        placeholder="admin@example.com"
+                        class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none"
                     >
                 </div>
             </div>
 
             <!-- Password -->
             <div>
-                <label class="block text-sm font-medium text-indigo-200 mb-2">Password</label>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Password</label>
                 <div class="relative">
-                    <i class="ri-lock-line absolute left-3.5 top-1/2 -translate-y-1/2 text-indigo-400 text-lg"></i>
+                    <i class="ri-lock-line absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg"></i>
                     <input
                         id="password"
                         type="password"
@@ -72,16 +74,16 @@
                         required
                         autocomplete="new-password"
                         placeholder="••••••••"
-                        class="w-full pl-10 pr-12 py-2.5 bg-white/10 border border-white/20 rounded-xl text-white placeholder-indigo-300/60 text-sm focus:border-indigo-400 focus:bg-white/15 transition"
+                        class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none"
                     >
                 </div>
             </div>
 
             <!-- Confirm Password -->
             <div>
-                <label class="block text-sm font-medium text-indigo-200 mb-2">Confirm Password</label>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Confirm Password</label>
                 <div class="relative">
-                    <i class="ri-lock-line absolute left-3.5 top-1/2 -translate-y-1/2 text-indigo-400 text-lg"></i>
+                    <i class="ri-lock-line absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg"></i>
                     <input
                         id="password_confirmation"
                         type="password"
@@ -89,18 +91,18 @@
                         required
                         autocomplete="new-password"
                         placeholder="••••••••"
-                        class="w-full pl-10 pr-12 py-2.5 bg-white/10 border border-white/20 rounded-xl text-white placeholder-indigo-300/60 text-sm focus:border-indigo-400 focus:bg-white/15 transition"
+                        class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none"
                     >
                 </div>
             </div>
 
             <!-- Submit & Login Link -->
-            <div class="flex items-center justify-between mt-4">
-                <a href="{{ route('login') }}" class="underline text-sm text-indigo-300 hover:text-white">
+            <div class="flex items-center justify-between pt-2">
+                <a href="{{ route('login') }}" class="text-sm font-semibold text-slate-500 hover:text-indigo-600 transition underline underline-offset-4">
                     Already registered?
                 </a>
                 <button type="submit"
-                    class="py-3 px-5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold text-sm transition-all duration-200 transform hover:scale-[1.02] shadow-lg">
+                    class="py-3 px-8 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800 text-white font-bold text-sm transition-all duration-200 transform hover:scale-[1.01] active:scale-[0.99] shadow-lg shadow-indigo-200">
                     Register
                 </button>
             </div>
@@ -108,8 +110,6 @@
         </form>
     </div>
 
-    <p class="text-center text-indigo-400/60 text-xs mt-6">
-        © {{ date('Y') }} South Asia MRCGP [INT] Examination Board
-    </p>
+   
 
-</x-layouts.guest-layout>
+</x-layouts.guest>

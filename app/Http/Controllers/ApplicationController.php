@@ -271,9 +271,9 @@ class ApplicationController extends Controller
             'rejected' => Application::rejected()->count(),
         ];
 
-        // Charts – registrations over last 30 days
+        // Charts – registrations over last 7 days
         $timeChartData = Application::selectRaw('DATE(created_at) as date, COUNT(*) as count')
-            ->where('created_at', '>=', now()->subDays(30))
+            ->where('created_at', '>=', now()->subDays(7))
             ->groupBy('date')
             ->orderBy('date')
             ->get();

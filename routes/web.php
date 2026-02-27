@@ -38,9 +38,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // routes that require a logged-in admin/staff (session flag checked by admin.auth alias)
     Route::middleware(['auth', 'admin.auth'])->group(function () {
-        // entry point / dashboard -- render dashboard with stats
-        Route::get('dashboard', [ApplicationController::class, 'dashboard'])
-            ->name('dashboard');
+        // Admin only dashboard
+        Route::middleware('role:admin')->group(function () {
+            Route::get('dashboard', [ApplicationController::class, 'dashboard'])
+                ->name('dashboard');
+        });
 
         // applications resource-like endpoints used by the admin UI
         Route::get('applications', [ApplicationController::class, 'adminIndex'])
