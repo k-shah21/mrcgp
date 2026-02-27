@@ -19,7 +19,7 @@ class CheckEligibilityRequest extends FormRequest
         ];
 
         if ($this->input('candidateType') === 'new') {
-            $rules['email']          = 'required|email:rfc,dns|max:255';
+            $rules['email']          = 'required|email:rfc|max:255';
             $rules['usualForename']  = 'required|string|max:255';
             $rules['lastName']       = 'required|string|max:255';
         }

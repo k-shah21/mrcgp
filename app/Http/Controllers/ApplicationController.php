@@ -26,7 +26,9 @@ class ApplicationController extends Controller
      */
     public function checkEligibility(CheckEligibilityRequest $request): JsonResponse
     {
-        Log::info('Checking eligibility', $request->all());
+        $startTime = microtime(true);
+        Log::info('Checking eligibility START', ['payload' => $request->all()]);
+        
         $type = $request->validated()['candidateType'];
 
         // ── Old candidate: verify candidateId exists ────────────
@@ -41,13 +43,8 @@ class ApplicationController extends Controller
                 ], 422);
             }
 
-            // Passport must match
-            // if ($existing->passportNumber !== $request->passportNumber) {
-            //     return response()->json([
-            //         'status' => 'error',
-            //         'errors' => ['passportNumber' => ['Passport number does not match the candidate record.']],
-            //     ], 422);
-            // }
+            $duration = microtime(true) - $startTime;
+            Log::info('Old candidate verified', ['duration' => $duration]);
 
             return response()->json([
                 'status' => 'success',
@@ -64,6 +61,9 @@ class ApplicationController extends Controller
         $emailExists = Application::where('email', $request->email)->exists();
         $passportExists = Application::where('passportNumber', $request->passportNumber)->exists();
 
+        $duration = microtime(true) - $startTime;
+        Log::info('New candidate duplicate check finished', ['duration' => $duration, 'emailExists' => $emailExists, 'passportExists' => $passportExists]);
+
         if ($emailExists || $passportExists) {
             $errors = [];
             if ($emailExists) {
@@ -79,6 +79,8 @@ class ApplicationController extends Controller
                 'errors' => $errors,
             ], 409);
         }
+
+        Log::info('Checking eligibility SUCCESS', ['duration' => microtime(true) - $startTime]);
 
         return response()->json([
             'status' => 'success',

@@ -1135,7 +1135,7 @@
     </div>
 
     <div id="loading-modal"
-        class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm flex items-center justify-center flex-col transition-opacity duration-300 opacity-0">
+        class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm items-center justify-center flex-col transition-opacity duration-300 opacity-0">
         <div class="bg-white rounded-xl shadow-2xl p-8 flex flex-col items-center max-w-sm w-full mx-4 transform transition-all scale-95 duration-300"
             id="loading-modal-inner">
             <svg class="animate-spin -ml-1 mr-3 h-10 w-10 text-indigo-600 mb-4" xmlns="http://www.w3.org/2000/svg"
@@ -1980,6 +1980,22 @@
             const step1 = document.getElementById('step-1');
             const form = document.getElementById('application-form');
 
+            // Prevent Enter key from submitting form (which often hits POST size limits)
+            if (form) {
+                form.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        const target = e.target;
+                        if (target.tagName === 'INPUT' || target.tagName === 'SELECT') {
+                            e.preventDefault();
+                            // If in Step 1, trigger check eligibility instead?
+                            if (step1 && !step1.classList.contains('hidden')) {
+                                checkEligBtn.click();
+                            }
+                        }
+                    }
+                });
+            }
+
             if (checkEligBtn) {
                 checkEligBtn.addEventListener('click', () => {
                     clearAllErrors(step1);
@@ -2066,18 +2082,23 @@
                         passportNumber: passportVal,
                     };
                     if (currentCandidateType === 'new') {
-                        eligPayload.email = emailVal;
-                        eligPayload.usualForename = forenameVal;
-                        eligPayload.lastName = lastNameVal;
+                        eligPayload.email = document.getElementById('email').value.trim();
+                        eligPayload.usualForename = document.getElementById('usualForename').value.trim();
+                        eligPayload.lastName = document.getElementById('lastName').value.trim();
                     } else {
                         eligPayload.candidateId = document.getElementById('step1-candidateId').value.trim();
                     }
+
+                    const checkEligBtn = document.getElementById('check-eligibility-btn');
+                    if (checkEligBtn) checkEligBtn.disabled = true;
 
                     $.ajax({
                         url: '/check-eligibility',
                         method: 'POST',
                         data: eligPayload,
+                        timeout: 30000, // 30 seconds timeout
                         success: function(resp) {
+                            if (checkEligBtn) checkEligBtn.disabled = false;
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Eligibility Confirmed!',
@@ -2104,6 +2125,7 @@
                             });
                         },
                         error: function(xhr) {
+                            if (checkEligBtn) checkEligBtn.disabled = false;
                             Swal.close();
                             const data = xhr.responseJSON || {};
                             if (xhr.status === 409) {
@@ -2501,40 +2523,41 @@
                             confirmButtonColor: '#6366f1',
                         }).then(() => {
                             // Scroll to top
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
 
-        // Clear Step 2 form fields
-        form.reset();
+                    // Clear Step 2 form fields
+                    form.reset();
 
-        // Clear drawn signature if any
-        clearSignature();
+                    // Clear drawn signature if any
+                    clearSignature();
 
-        // Clear file names and Dropzones
-        Object.keys(dropzoneInstances).forEach(id => {
-            dropzoneInstances[id].removeAllFiles();
-        });
-        document.querySelectorAll('input[type="file"]').forEach(input => {
-            input.value = '';
-        });
+                    // Clear file names and Dropzones
+                    Object.keys(dropzoneInstances).forEach(id => {
+                        dropzoneInstances[id].removeAllFiles();
+                    });
+                    document.querySelectorAll('input[type="file"]').forEach(input => {
+                        input.value = '';
+                    });
 
-        // Reset Step 1 section visibility
-        const step1 = document.getElementById('step-1');
-        const step2 = document.getElementById('step-2');
-        if (step1 && step2) {
-            step2.classList.add('hidden');
-            step1.classList.remove('hidden');
-            step1.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+                    // Reset Step 1 section visibility
+                    const step1 = document.getElementById('step-1');
+                    const step2 = document.getElementById('step-2');
+                    if (step1 && step2) {
+                        step2.classList.add('hidden');
+                        step1.classList.remove('hidden');
+                        step1.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
 
-        // Reset candidate type to default ('new')
-        handleCandidateTypeChange('new', document.querySelector('.cand-type-wrapper[data-target="radio-new"]')); 
-        
-        // Reset other custom Radix-style elements (like checkboxes)
-        document.querySelectorAll('button[role="checkbox"]').forEach(cb => {
-            cb.setAttribute('data-state', 'unchecked');
-            cb.setAttribute('aria-checked', 'false');
-            cb.innerHTML = '';
-        });                        });
+                    // Reset candidate type to default ('new')
+                    handleCandidateTypeChange('new', document.querySelector('.cand-type-wrapper[data-target="radio-new"]')); 
+                    
+                    // Reset other custom Radix-style elements (like checkboxes)
+                    document.querySelectorAll('button[role="checkbox"]').forEach(cb => {
+                        cb.setAttribute('data-state', 'unchecked');
+                        cb.setAttribute('aria-checked', 'false');
+                        cb.innerHTML = '';
+                    });                        
+                });
                     },
                     error: function(xhr) {
                         submitBtn.innerHTML = originalText;
@@ -2559,8 +2582,8 @@
                         } else {
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Something Went Wrong',
-                                text: data.message || 'We experienced a temporary issue while submitting your application. No data has been saved. Please wait a moment and try again. If this persists, contact our support team.',
+                                title: 'Submission Error',
+                                text: data.message || 'The server rejected the submission. This is often caused by uploading files that are too large (total limit is usually 8-10MB). Please try with smaller/compressed files or contact support.',
                                 confirmButtonColor: '#6366f1',
                             });
                         }

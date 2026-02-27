@@ -27,7 +27,7 @@ class StoreApplicationRequest extends FormRequest
 
         // New candidate specific rules
         if ($this->input('candidateType') === 'new') {
-            $rules['email']                        = ['required', 'email:rfc,dns', 'max:255', Rule::unique('applications', 'email')];
+            $rules['email']                        = ['required', 'email:rfc', 'max:255', Rule::unique('applications', 'email')];
             $rules['usualForename']                = 'required|string|max:255';
             $rules['lastName']                     = 'required|string|max:255';
             $rules['poBox']                        = 'required|string|max:255';
@@ -71,7 +71,7 @@ class StoreApplicationRequest extends FormRequest
         if ($this->input('candidateType') === 'old') {
             $rules['candidateId'] = 'required|string|size:7';
             $rules['eligibilityCriterion'] = 'nullable|string';
-            $rules['email']                = 'nullable|email:rfc,dns|max:255';
+            $rules['email']                = 'nullable|email:rfc|max:255';
         }
 
         return $rules;
