@@ -1,30 +1,42 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ $title ?? 'Admin Login – MRCGP Portal' }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.1.0/fonts/remixicon.css" rel="stylesheet">
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    <style>
+        body { font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%); }
+        .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.12); }
+        input:focus { outline: none; }
+    </style>
+</head>
 
-        <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    </head>
-    <body class="font-sans text-gray-900 antialiased">
-        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
-            <div>
-                <a href="/">
-                    <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
-                </a>
-            </div>
+<body class="min-h-screen gradient-bg flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+        {{ $slot }}
+    </div>
 
-            <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
-                {{ $slot }}
-            </div>
-        </div>
-    </body>
+    <script>
+        const toggleBtn = document.getElementById('toggle-pw');
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', function () {
+                const pw = document.getElementById('password');
+                const icon = document.getElementById('eye-icon');
+
+                if (pw.type === 'password') {
+                    pw.type = 'text';
+                    icon.className = 'ri-eye-off-line text-lg';
+                } else {
+                    pw.type = 'password';
+                    icon.className = 'ri-eye-line text-lg';
+                }
+            });
+        }
+    </script>
+</body>
 </html>

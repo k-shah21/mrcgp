@@ -233,6 +233,19 @@ class ApplicationController extends Controller
             $data['fullNameOnRecord'] = trim(($data['usualForename'] ?? '') . ' ' . ($data['lastName'] ?? ''));
         }
 
+        // Map preview_files from JSON strings to arrays/objects
+        if (isset($data['preview_files'])) {
+            foreach ($data['preview_files'] as $key => $value) {
+                if (is_array($value)) {
+                    foreach ($value as $subKey => $subValue) {
+                        $data['preview_files'][$key][$subKey] = json_decode($subValue);
+                    }
+                } else {
+                    $data['preview_files'][$key] = json_decode($value);
+                }
+            }
+        }
+
         $pdf = Pdf::loadView('pdf.application', $data);
 
         return $pdf->stream('application-preview.pdf');
