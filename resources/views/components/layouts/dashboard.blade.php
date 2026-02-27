@@ -58,6 +58,15 @@
                             'route' => 'admin.applications.index',
                         ],
                     ];
+
+                    // Admin-only nav items
+                    if (auth()->check() && auth()->user()->isAdmin()) {
+                        $navItems[] = [
+                            'label' => 'Staff',
+                            'icon' => 'ri-team-line',
+                            'route' => 'admin.staff.index',
+                        ];
+                    }
                 @endphp
 
                 @foreach ($navItems as $item)

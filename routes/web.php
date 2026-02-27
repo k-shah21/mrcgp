@@ -1,14 +1,21 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminAuthController;
+use App\Http\Controllers\Admin\StaffController;
+
+use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\ProfileController;
-use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Route; 
+
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-use App\Http\Controllers\ApplicationController;
-use App\Http\Controllers\Admin\AdminAuthController;
+Route::get('/test/mail', function () {
+    Mail::raw('MailHog test', fn ($m) => $m->to('test@test.com')->subject('Test'));
+});
 
 // ------------- public application endpoints --------------------------------------
 Route::post('/check-eligibility', [ApplicationController::class, 'checkEligibility'])
@@ -29,7 +36,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             ->name('login.submit');
     });
 
-    // routes that require a logged-in admin (session flag checked by admin.auth alias)
+    // routes that require a logged-in admin/staff (session flag checked by admin.auth alias)
     Route::middleware(['auth', 'admin.auth'])->group(function () {
         // entry point / dashboard -- render dashboard with stats
         Route::get('dashboard', [ApplicationController::class, 'dashboard'])
@@ -42,6 +49,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
             ->name('applications.show');
         Route::patch('applications/{application}/status', [ApplicationController::class, 'updateStatus'])
             ->name('applications.update-status');
+
+        // ── Staff Management (Admin Only) ──────────────────────
+        Route::middleware('role:admin')->prefix('staff')->name('staff.')->group(function () {
+            Route::get('/', [StaffController::class, 'index'])->name('index');
+            Route::get('/create', [StaffController::class, 'create'])->name('create');
+            Route::post('/', [StaffController::class, 'store'])->name('store');
+            Route::patch('/{user}/toggle-status', [StaffController::class, 'toggleStatus'])->name('toggle-status');
+            Route::post('/{user}/resend-invite', [StaffController::class, 'resendInvite'])->name('resend-invite');
+        });
 
         Route::post('logout', [AdminAuthController::class, 'logout'])
             ->name('logout');

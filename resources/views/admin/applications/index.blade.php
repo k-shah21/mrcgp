@@ -29,11 +29,30 @@
                     <option value="old" {{ $type === 'old' ? 'selected' : '' }}>Old</option>
                 </select>
             </div>
+
+            {{-- Handled By Filter (Admin Only) --}}
+            @if (auth()->check() && auth()->user()->isAdmin() && isset($handlers) && $handlers->count())
+                <div>
+                    <label class="block text-[11px] font-semibold uppercase tracking-wide text-slate-500 mb-1">Handled
+                        By</label>
+                    <select name="handled_by"
+                        class="h-9 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500/70 transition-all">
+                        <option value="">All Users</option>
+                        @foreach ($handlers as $handler)
+                            <option value="{{ $handler->id }}"
+                                {{ ($handledBy ?? '') == $handler->id ? 'selected' : '' }}>
+                                {{ $handler->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            @endif
+
             <button type="submit"
                 class="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 px-5 py-2 text-xs font-semibold text-white hover:bg-slate-800 transition shadow-sm h-9">
                 <i class="ri-filter-3-line text-sm"></i> Filter
             </button>
-            @if (request()->hasAny(['search', 'status', 'type']))
+            @if (request()->hasAny(['search', 'status', 'type', 'handled_by']))
                 <a href="{{ route('admin.applications.index') }}"
                     class="px-4 py-2 text-xs font-medium text-slate-500 hover:text-slate-700 transition">
                     Clear
@@ -61,6 +80,9 @@
                         <th
                             class="border-b border-slate-100 bg-slate-50/80 text-[11px] uppercase tracking-[0.16em] text-slate-500 font-semibold px-4 py-3">
                             Status</th>
+                        <th
+                            class="border-b border-slate-100 bg-slate-50/80 text-[11px] uppercase tracking-[0.16em] text-slate-500 font-semibold px-4 py-3">
+                            Handled By</th>
                         <th
                             class="border-b border-slate-100 bg-slate-50/80 text-[11px] uppercase tracking-[0.16em] text-slate-500 font-semibold px-4 py-3">
                             Date</th>
@@ -99,6 +121,9 @@
                                 </x-badge>
                             </td>
                             <td class="border-b border-slate-100 px-4 py-3 text-xs text-slate-500">
+                                {{ $app->handledBy?->name ?? '—' }}
+                            </td>
+                            <td class="border-b border-slate-100 px-4 py-3 text-xs text-slate-500">
                                 {{ $app->created_at?->format('M d, Y') }}
                             </td>
                             <td class="border-b border-slate-100 px-4 py-3">
@@ -110,7 +135,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-4 py-8 text-center text-xs text-slate-400">
+                            <td colspan="8" class="px-4 py-8 text-center text-xs text-slate-400">
                                 No applications found.
                             </td>
                         </tr>

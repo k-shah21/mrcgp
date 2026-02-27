@@ -41,19 +41,30 @@ class AdminAuthController extends Controller
         ]);
 
         if (\Illuminate\Support\Facades\Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+            $user = \Illuminate\Support\Facades\Auth::user();
+
+            // Check if account is active
+            if (! $user->is_active) {
+                \Illuminate\Support\Facades\Auth::logout();
+                return back()
+                    ->withInput($request->only('email'))
+                    ->withErrors(['email' => 'Your account has been deactivated. Please contact an administrator.']);
+            }
+
             // Regenerate session to prevent session fixation
             $request->session()->regenerate();
 
             session([
                 'admin_logged_in' => true,
                 'admin_email'     => $request->email,
+                'admin_role'      => $user->role,
                 'admin_login_at'  => now()->toDateTimeString(),
             ]);
 
-            Log::info('Admin login successful', ['email' => $request->email, 'ip' => $request->ip()]);
+            Log::info('Admin login successful', ['email' => $request->email, 'role' => $user->role, 'ip' => $request->ip()]);
 
             return redirect()->route('admin.dashboard')
-                ->with('success', 'Welcome back, Admin!');
+                ->with('success', "Welcome back, {$user->name}!");
         }
 
         Log::warning('Failed admin login attempt', ['email' => $request->email, 'ip' => $request->ip()]);
