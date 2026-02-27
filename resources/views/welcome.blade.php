@@ -2117,7 +2117,16 @@
                                 if (data.errors) showInlineErrors(data.errors, step1);
                             } else if (xhr.status === 422) {
                                 // Validation errors from server
-                                if (data.errors) showInlineErrors(data.errors, step1);
+                                if (data.errors && data.errors.candidateId && currentCandidateType === 'old') {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Record Not Found',
+                                        text: data.errors.candidateId[0],
+                                        confirmButtonColor: '#6366f1',
+                                    });
+                                } else if (data.errors) {
+                                    showInlineErrors(data.errors, step1);
+                                }
                             } else if (xhr.status === 0) {
                                 Swal.fire({
                                     icon: 'error',
