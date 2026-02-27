@@ -2,9 +2,9 @@
 
     <!-- Header -->
     <div class="text-center mb-8">
-        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/10 border border-white/20 mb-4 shadow-lg">
+        <!-- <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/10 border border-white/20 mb-4 shadow-lg">
             <span class="text-white font-bold text-xl">MRC</span>
-        </div>
+        </div> -->
         <h1 class="text-2xl font-bold text-white tracking-tight">MRCGP Admin Portal</h1>
         <p class="text-indigo-300 text-sm mt-1">Sign in to manage applications</p>
     </div>

@@ -2015,24 +2015,35 @@
 
                     // Validate Step 1 required fields
                     const step1Errors = {};
-                    const forenameVal = document.getElementById('usualForename').value.trim();
-                    if (!forenameVal) step1Errors['usualForename'] = ['Please enter your Usual Forename as it appears on your official documents.'];
-                    const lastNameVal = document.getElementById('lastName').value.trim();
-                    if (!lastNameVal) step1Errors['lastName'] = ['Please enter your Last Name as it appears on your official documents.'];
-                    const emailVal = document.getElementById('email').value.trim();
-                    if (!emailVal) {
-                        step1Errors['email'] = ['An email address is required so we can send you important updates about your application.'];
-                    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
-                        step1Errors['email'] = ['The email address you entered does not look valid. Please use a format like name@example.com.'];
+                    const isNew = currentCandidateType === 'new';
+                    const isOld = currentCandidateType === 'old';
+
+                    if (isNew) {
+                        const forenameVal = document.getElementById('usualForename').value.trim();
+                        if (!forenameVal) step1Errors['usualForename'] = ['Please enter your Usual Forename as it appears on your official documents.'];
+                        
+                        const lastNameVal = document.getElementById('lastName').value.trim();
+                        if (!lastNameVal) step1Errors['lastName'] = ['Please enter your Last Name as it appears on your official documents.'];
+                        
+                        const emailVal = document.getElementById('email').value.trim();
+                        if (!emailVal) {
+                            step1Errors['email'] = ['An email address is required so we can send you important updates about your application.'];
+                        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+                            step1Errors['email'] = ['The email address you entered does not look valid. Please use a format like name@example.com.'];
+                        }
                     }
+
+                    if (isOld) {
+                        const candId = document.getElementById('step1-candidateId').value.trim();
+                        if (!candId) {
+                            step1Errors['candidateId'] = ['Candidate ID is required for old candidates. Please enter your 7-digit ID.'];
+                        } else if (candId.length !== 7) {
+                            step1Errors['candidateId'] = ['The Candidate ID you entered is invalid. It must be exactly 7 digits long.'];
+                        }
+                    }
+
                     const passportVal = document.getElementById('step1-passportNumber').value.trim();
                     if (!passportVal) step1Errors['passportNumber'] = ['Please provide your Passport ID as per country government.'];
-
-                    // if (currentCandidateType === 'old') {
-                    //     const candId = document.getElementById('step1-candidateId').value.trim();
-                    //     if (!candId) step1Errors['candidateId'] = ['Candidate ID is required'];
-                    //     else if (candId.length !== 7) step1Errors['candidateId'] = ['Candidate ID must be 7 digits'];
-                    // }
 
                     if (Object.keys(step1Errors).length > 0) {
                         showInlineErrors(step1Errors, step1);
@@ -2075,6 +2086,13 @@
                                 timer: 2500,
                                 timerProgressBar: true,
                             }).then(() => {
+                                // Pre-fill Step 1 fields with server data for Old Candidates
+                                if (currentCandidateType === 'old' && resp.data) {
+                                    if (resp.data.usualForename) document.getElementById('usualForename').value = resp.data.usualForename;
+                                    if (resp.data.lastName) document.getElementById('lastName').value = resp.data.lastName;
+                                    if (resp.data.email) document.getElementById('email').value = resp.data.email;
+                                }
+
                                 step1.classList.add('hidden');
                                 const step2 = document.getElementById('step-2');
                                 if (step2) {
@@ -2086,6 +2104,7 @@
                             });
                         },
                         error: function(xhr) {
+                            Swal.close();
                             const data = xhr.responseJSON || {};
                             if (xhr.status === 409) {
                                 // Duplicate detected

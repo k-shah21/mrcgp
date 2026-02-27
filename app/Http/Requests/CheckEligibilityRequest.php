@@ -47,7 +47,7 @@ class CheckEligibilityRequest extends FormRequest
             'lastName.max' => 'The Last Name provided exceeds the character limit. Please shorten it to proceed.',
             'candidateId.required' => 'A Candidate ID is required for old candidates. Please enter your existing ID to continue.',
             'candidateId.string' => 'The Candidate ID provided is in an invalid format. It should be a text string.',
-            'candidateId.size' => 'Your Candidate ID must be exactly characters long. Please check your records and enter the correct 7-character ID.',
+            'candidateId.size' => 'Your Candidate ID must be exactly 7 characters long. Please check your records and enter the correct 7-character ID.',
         ];
     }
 }

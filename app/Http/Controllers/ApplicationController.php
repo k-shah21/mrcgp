@@ -26,6 +26,7 @@ class ApplicationController extends Controller
      */
     public function checkEligibility(CheckEligibilityRequest $request): JsonResponse
     {
+        Log::info('Checking eligibility', $request->all());
         $type = $request->validated()['candidateType'];
 
         // ── Old candidate: verify candidateId exists ────────────
