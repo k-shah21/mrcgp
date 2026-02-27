@@ -46,7 +46,7 @@
                 @php
                     $navItems = [
                         ['label' => 'Dashboard', 'icon' => 'ri-dashboard-3-line', 'route' => 'admin.applications.index'],
-                        ['label' => 'Applications', 'icon' => 'ri-file-list-3-line', 'route' => 'admin.applications.index'],
+                        // ['label' => 'Applications', 'icon' => 'ri-file-list-3-line', 'route' => 'admin.applications.index'],
                     ];
                 @endphp
 

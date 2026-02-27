@@ -328,7 +328,7 @@
                                         </div>
 
                                         <div class="space-y-2 flex flex-col justify-between">
-                                            <label class="text-sm font-medium leading-none pt-1" for="previousAttempts">No.
+                                            <label class="text-sm font-medium leading-none pt-8" for="previousAttempts">No.
                                                 of previous AKTs attempts <span class="text-red-500">*</span></label>
                                             <select name="previousAttempts" id="previousAttempts"
                                                 class="flex h-9 w-full rounded-md border px-3 py-1 text-base shadow-sm transition-colors md:text-sm bg-slate-50 border-slate-200 focus-visible:ring-indigo-500">
