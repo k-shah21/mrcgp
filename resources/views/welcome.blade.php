@@ -76,7 +76,7 @@
                 </div>
             </div>
             <div class="p-6">
-                <form id="application-form" enctype="multipart/form-data">
+                <form id="application-form" method="POST" action="/apply" enctype="multipart/form-data">
                     @csrf
                     <div>
 
@@ -1261,14 +1261,23 @@
                 uploadSection.classList.add('hidden');
                 drawBtn.className = 'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium h-9 px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow transition-all duration-200 transform hover:scale-105';
                 uploadBtn.className = 'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium h-10 px-4 py-2 border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50';
+                
+                // Clear upload data when switching to draw
+                if (dropzoneInstances['signature-upload']) {
+                    dropzoneInstances['signature-upload'].removeAllFiles();
+                }
+                clearErrorForField('signature-upload');
+                
                 setTimeout(initSignaturePad, 100);
             } else {
                 drawSection.classList.add('hidden');
                 uploadSection.classList.remove('hidden');
                 uploadBtn.className = 'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium h-9 px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow transition-all duration-200 transform hover:scale-105';
                 drawBtn.className = 'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium h-10 px-4 py-2 border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50';
+                
+                // Clear drawn data when switching to upload
+                clearSignature();
                 clearErrorForField('signature-canvas');
-                clearErrorForField('signature-upload');
             }
         }
 
@@ -2115,40 +2124,163 @@
             // ================================
             const previewActionBtn = document.getElementById('preview-action-btn');
             if (previewActionBtn) {
-                previewActionBtn.addEventListener('click', () => {
-                    const tempForm = document.createElement('form');
-                    tempForm.method = 'POST';
-                    tempForm.action = '/preview-application';
-                    tempForm.target = '_blank';
-                    
-                    const csrf = document.createElement('input');
-                    csrf.type = 'hidden';
-                    csrf.name = '_token';
-                    csrf.value = document.querySelector('input[name="_token"]').value;
-                    tempForm.appendChild(csrf);
+                previewActionBtn.addEventListener('click', async () => {
+                    // Show a toast or loading state if needed
+                    const originalBtnContent = previewActionBtn.innerHTML;
+                    previewActionBtn.innerHTML = '<svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Generating...';
+                    previewActionBtn.disabled = true;
 
-                    // Candidate type
-                    const typeInp = document.createElement('input');
-                    typeInp.type = 'hidden';
-                    typeInp.name = 'candidateType';
-                    typeInp.value = currentCandidateType;
-                    tempForm.appendChild(typeInp);
+                    try {
+                        const tempForm = document.createElement('form');
+                        tempForm.method = 'POST';
+                        tempForm.action = '/preview-application';
+                        tempForm.target = '_blank';
+                        
+                        const csrf = document.createElement('input');
+                        csrf.type = 'hidden';
+                        csrf.name = '_token';
+                        csrf.value = document.querySelector('input[name="_token"]').value;
+                        tempForm.appendChild(csrf);
 
-                    // All form data
-                    const previewFormData = new FormData(form);
-                    for (let [key, value] of previewFormData.entries()) {
-                        if (typeof value === 'string' && key !== '_token') {
-                            const input = document.createElement('input');
-                            input.type = 'hidden';
-                            input.name = key;
-                            input.value = value;
-                            tempForm.appendChild(input);
+                        // Candidate type
+                        const typeInp = document.createElement('input');
+                        typeInp.type = 'hidden';
+                        typeInp.name = 'candidateType';
+                        typeInp.value = currentCandidateType;
+                        tempForm.appendChild(typeInp);
+
+                        // All form data
+                        const previewFormData = new FormData(form);
+                        for (let [key, value] of previewFormData.entries()) {
+                            if (typeof value === 'string' && key !== '_token') {
+                                const input = document.createElement('input');
+                                input.type = 'hidden';
+                                input.name = key;
+                                input.value = value;
+                                tempForm.appendChild(input);
+                            }
                         }
-                    }
 
-                    document.body.appendChild(tempForm);
-                    tempForm.submit();
-                    document.body.removeChild(tempForm);
+                        // Collect files from Dropzone and convert to Base64 (with compression for images)
+                        const filePromises = [];
+                        
+                        const getBase64 = (file) => {
+                            return new Promise((resolve, reject) => {
+                                // For images, we want to compress/resize to keep POST size small
+                                if (file.type.startsWith('image/')) {
+                                    const reader = new FileReader();
+                                    reader.readAsDataURL(file);
+                                    reader.onload = (event) => {
+                                        const img = new Image();
+                                        img.src = event.target.result;
+                                        img.onload = () => {
+                                            const canvas = document.createElement('canvas');
+                                            const MAX_WIDTH = 1000; // Sufficient for PDF
+                                            let width = img.width;
+                                            let height = img.height;
+
+                                            if (width > MAX_WIDTH) {
+                                                height *= MAX_WIDTH / width;
+                                                width = MAX_WIDTH;
+                                            }
+
+                                            canvas.width = width;
+                                            canvas.height = height;
+                                            const ctx = canvas.getContext('2d');
+                                            ctx.drawImage(img, 0, 0, width, height);
+                                            
+                                            // Get compressed base64
+                                            resolve(canvas.toDataURL('image/jpeg', 0.7)); 
+                                        };
+                                    };
+                                    reader.onerror = error => reject(error);
+                                } else {
+                                    // Non-images (PDFs) stay as they are
+                                    const reader = new FileReader();
+                                    reader.readAsDataURL(file);
+                                    reader.onload = () => resolve(reader.result);
+                                    reader.onerror = error => reject(error);
+                                }
+                            });
+                        };
+
+                        for (const id in dropzoneInstances) {
+                            // SKIP signature upload if we are currently in DRAW mode
+                            const isDrawTabActiveForPreview = !document.getElementById('signature-draw-section').classList.contains('hidden');
+                            if (id === 'signature-upload' && isDrawTabActiveForPreview) continue;
+
+                            const dz = dropzoneInstances[id];
+                            const input = document.getElementById(dz.element.getAttribute('data-target-id'));
+                            const fieldName = input ? input.name : null;
+                            
+                            if (fieldName && dz.files.length > 0) {
+                                if (fieldName.endsWith('[]')) {
+                                    const baseName = fieldName.replace('[]', '');
+                                    for (let i = 0; i < dz.files.length; i++) {
+                                        const file = dz.files[i];
+                                        filePromises.push((async () => {
+                                            try {
+                                                const data = await getBase64(file);
+                                                const inp = document.createElement('input');
+                                                inp.type = 'hidden';
+                                                inp.name = `preview_files[${baseName}][${i}]`;
+                                                inp.value = JSON.stringify({
+                                                    name: file.name,
+                                                    type: file.type,
+                                                    data: data
+                                                });
+                                                tempForm.appendChild(inp);
+                                            } catch (e) { console.error('File prep failed', e); }
+                                        })());
+                                    }
+                                } else {
+                                    const file = dz.files[0];
+                                    filePromises.push((async () => {
+                                        try {
+                                            const data = await getBase64(file);
+                                            const inp = document.createElement('input');
+                                            inp.type = 'hidden';
+                                            inp.name = `preview_files[${fieldName}]`;
+                                            inp.value = JSON.stringify({
+                                                name: file.name,
+                                                type: file.type,
+                                                data: data
+                                            });
+                                            tempForm.appendChild(inp);
+                                        } catch (e) { console.error('File prep failed', e); }
+                                    })());
+                                }
+                            }
+                        }
+
+                        // Add Drawn Signature to preview if active
+                        const isDrawTabForPreview = !document.getElementById('signature-draw-section').classList.contains('hidden');
+                        if (isDrawTabForPreview) {
+                            const sigData = document.getElementById('signature-data').value;
+                            if (sigData && sigData.length > 10) {
+                                const inp = document.createElement('input');
+                                inp.type = 'hidden';
+                                inp.name = `preview_files[signature]`;
+                                inp.value = JSON.stringify({
+                                    name: 'Drawn Signature',
+                                    type: 'image/png',
+                                    data: sigData
+                                });
+                                tempForm.appendChild(inp);
+                            }
+                        }
+
+                        await Promise.all(filePromises);
+
+                        document.body.appendChild(tempForm);
+                        tempForm.submit();
+                        document.body.removeChild(tempForm);
+                    } catch (err) {
+                        console.error('Preview generation failed:', err);
+                    } finally {
+                        previewActionBtn.innerHTML = originalBtnContent;
+                        previewActionBtn.disabled = false;
+                    }
                 });
             }
 
@@ -2225,12 +2357,19 @@
                     return;
                 }
 
-                // Frontend: check signature
-                const sigData = document.getElementById('signature-data').value;
-                const sigUpload = document.getElementById('signature-upload');
-                const hasSig = (sigData && sigData.length > 10) || (sigUpload && sigUpload.files.length > 0);
+                // Frontend: check signature based on active tab
+                const isDrawTabActive = !document.getElementById('signature-draw-section').classList.contains('hidden');
+                let hasSignature = false;
+                
+                if (isDrawTabActive) {
+                    const sigData = document.getElementById('signature-data').value;
+                    hasSignature = sigData && sigData.length > 10;
+                } else {
+                    const dz = dropzoneInstances['signature-upload'];
+                    hasSignature = dz && dz.files.length > 0;
+                }
 
-                if (!hasSig) {
+                if (!hasSignature) {
                     const sigSection = document.getElementById('signature-draw-section');
                     const uploadSection = document.getElementById('signature-upload-section');
                     const visibleSigSection = (sigSection && !sigSection.classList.contains('hidden')) ? sigSection : uploadSection;
@@ -2239,7 +2378,6 @@
                         const errorTarget = (visibleSigSection.id === 'signature-draw-section') ? document.getElementById('signature-canvas') : document.getElementById('signature-upload');
                         showFieldError(errorTarget, 'Please provide your signature.');
                         visibleSigSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        if (errorTarget.focus) setTimeout(() => errorTarget.focus(), 500);
                     }
                     return;
                 }
@@ -2283,12 +2421,19 @@
                 const formData = new FormData(form);
 
                 // Add Dropzone files to formData
+                const isDrawTabActiveForSubmit = !document.getElementById('signature-draw-section').classList.contains('hidden');
+                
                 Object.keys(dropzoneInstances).forEach(id => {
+                    // Skip signature upload if we are using the drawing tool
+                    if (id === 'signature-upload' && isDrawTabActiveForSubmit) return;
+
                     const dz = dropzoneInstances[id];
                     const input = document.getElementById(id);
+                    if (!input) return; // robustness check
+
                     const name = input.name;
                     
-                    // Remove existing file entries from formData if any (new FormData includes them if they are in the form)
+                    // Remove existing file entries from formData if any
                     formData.delete(name);
                     
                     // Add files from Dropzone
@@ -2297,10 +2442,15 @@
                     });
                 });
 
-                // Ensure signature data is included (drawn signature)
-                const sigDataVal = document.getElementById('signature-data').value;
-                if (sigDataVal && sigDataVal.length > 10) {
-                    formData.set('signature', sigDataVal);
+                // Ensure signature data is included (drawn signature) only if active
+                if (isDrawTabActiveForSubmit) {
+                    const sigDataVal = document.getElementById('signature-data').value;
+                    if (sigDataVal && sigDataVal.length > 10) {
+                        formData.set('signature', sigDataVal);
+                    }
+                    formData.delete('signatureUpload'); // Ensure consistency
+                } else {
+                    formData.delete('signature'); // Clear drawn data if uploading
                 }
 
                 // NOTE: examCenterPreference and eligibilityCriterion are now native
@@ -2350,7 +2500,13 @@
 
         // Reset candidate type to default ('new')
         handleCandidateTypeChange('new', document.querySelector('.cand-type-wrapper[data-target="radio-new"]')); 
-                        });
+        
+        // Reset other custom Radix-style elements (like checkboxes)
+        document.querySelectorAll('button[role="checkbox"]').forEach(cb => {
+            cb.setAttribute('data-state', 'unchecked');
+            cb.setAttribute('aria-checked', 'false');
+            cb.innerHTML = '';
+        });                        });
                     },
                     error: function(xhr) {
                         submitBtn.innerHTML = originalText;

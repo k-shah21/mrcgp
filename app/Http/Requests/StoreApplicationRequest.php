@@ -52,6 +52,10 @@ class StoreApplicationRequest extends FormRequest
             $rules['internship_certificates']      = 'required|array|min:1';
             $rules['internship_certificates.*']    = 'file|mimes:jpeg,png,jpg,pdf|max:5120';
 
+            // Signature validation
+            $rules['signature']                    = 'required_without:signatureUpload|string|nullable';
+            $rules['signatureUpload']              = 'required_without:signature|file|mimes:jpeg,png,jpg|max:3072|nullable';
+
             // Conditional on eligibility criterion
             $elig = $this->input('eligibilityCriterion');
             if (in_array($elig, ['A', 'B'])) {
@@ -122,6 +126,10 @@ class StoreApplicationRequest extends FormRequest
             'country.required' => 'Please provide the Country of your current residence.',
             'schoolName.required' => 'The name of your Medical School is required to verify your educational background.',
             'qualificationYear.numeric' => 'The Qualification Year must be a valid numeric year.',
+            'signature.required_without' => 'Please provide your signature by drawing it or uploading an image.',
+            'signatureUpload.required_without' => 'Please provide your signature by drawing it or uploading an image.',
+            'signatureUpload.mimes' => 'The uploaded signature must be an image (jpeg, png, jpg).',
+            'signatureUpload.max' => 'The signature image size must not exceed 3MB.',
         ];
     }
 }
