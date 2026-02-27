@@ -64,7 +64,7 @@ class AdminAuthController extends Controller
             Log::info('Admin login successful', ['email' => $request->email, 'role' => $user->role, 'ip' => $request->ip()]);
 
             // Determine redirect route based on role
-            $redirectRoute = $user->isAdmin() ? 'admin.dashboard' : 'admin.applications.index';
+            $redirectRoute = $user->isAdmin() ? 'admin.dashboard' : 'user.applications.index';
 
             return redirect()->route($redirectRoute)
                 ->with('success', "Welcome back, {$user->name}!");
@@ -88,7 +88,7 @@ class AdminAuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('admin.login')
+        return redirect()->route('login')
             ->with('success', 'You have been logged out successfully.');
     }
 }

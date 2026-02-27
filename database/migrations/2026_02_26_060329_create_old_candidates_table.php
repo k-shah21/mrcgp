@@ -13,12 +13,8 @@ return new class extends Migration
     {
         Schema::create('old_candidates', function (Blueprint $table) {
             $table->id();
-            $table->string('candidate_id', 7)->unique();
-            $table->string('passportNumber')->nullable();
-            $table->string('usualForename')->nullable();
-            $table->string('lastName')->nullable();
-            $table->string('email')->nullable();
             $table->string('name')->nullable();
+            $table->string('candidate_id', 7)->unique()->nullable();  
             $table->timestamps();
         });
     }

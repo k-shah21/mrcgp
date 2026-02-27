@@ -1,4 +1,4 @@
-<x-layouts.guest title="Confirm Password – MRCGP Portal">
+l<x-layouts.guest title="Confirm Password – MRCGP Portal">
 
      <!-- Header -->
     <div class="text-center mb-8">

@@ -96,7 +96,7 @@
                     </div>
                 </div> --}}
 
-                <form method="POST" action="{{ route('admin.logout') }}" class="w-full">
+                <form method="POST" action="{{ route('logout') }}" class="w-full">
                     @csrf
                     <button type="submit"
                         class="w-full group flex items-center gap-x-3 rounded-xl px-3 py-2 text-sm font-medium transition text-slate-300 hover:bg-slate-800/70 hover:text-white">

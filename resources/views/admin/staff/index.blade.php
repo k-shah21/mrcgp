@@ -19,9 +19,9 @@
                         <th
                             class="border-b border-slate-100 bg-slate-50/80 text-[11px] uppercase tracking-[0.16em] text-slate-500 font-semibold px-4 py-3">
                             Email</th>
-                        <th
+                        {{-- <th
                             class="border-b border-slate-100 bg-slate-50/80 text-[11px] uppercase tracking-[0.16em] text-slate-500 font-semibold px-4 py-3">
-                            Status</th>
+                            Status</th> --}}
                         <th
                             class="border-b border-slate-100 bg-slate-50/80 text-[11px] uppercase tracking-[0.16em] text-slate-500 font-semibold px-4 py-3">
                             Approved</th>
@@ -31,9 +31,9 @@
                         <th
                             class="border-b border-slate-100 bg-slate-50/80 text-[11px] uppercase tracking-[0.16em] text-slate-500 font-semibold px-4 py-3">
                             Joined</th>
-                        <th
+                        {{-- <th
                             class="border-b border-slate-100 bg-slate-50/80 text-[11px] uppercase tracking-[0.16em] text-slate-500 font-semibold px-4 py-3">
-                            Actions</th>
+                            Actions</th> --}}
                     </tr>
                 </thead>
                 <tbody>
@@ -45,7 +45,7 @@
                             <td class="border-b border-slate-100 px-4 py-3 text-xs text-slate-600">
                                 {{ $staff->email }}
                             </td>
-                            <td class="border-b border-slate-100 px-4 py-3">
+                            {{-- <td class="border-b border-slate-100 px-4 py-3">
                                 @if ($staff->is_active)
                                     <span
                                         class="inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold ring-1 ring-inset bg-emerald-50 text-emerald-700 ring-emerald-200">Active</span>
@@ -53,7 +53,7 @@
                                     <span
                                         class="inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold ring-1 ring-inset bg-slate-100 text-slate-500 ring-slate-200">Inactive</span>
                                 @endif
-                            </td>
+                            </td> --}}
                             <td class="border-b border-slate-100 px-4 py-3 text-xs text-emerald-600 font-semibold">
                                 {{ $staff->approved_count ?? 0 }}
                             </td>
@@ -63,9 +63,8 @@
                             <td class="border-b border-slate-100 px-4 py-3 text-xs text-slate-500">
                                 {{ $staff->created_at?->format('M d, Y') }}
                             </td>
-                            <td class="border-b border-slate-100 px-4 py-3">
+                            {{-- <td class="border-b border-slate-100 px-4 py-3">
                                 <div class="flex items-center gap-2">
-                                    {{-- Toggle Status --}}
                                     <form method="POST" action="{{ route('admin.staff.toggle-status', $staff) }}"
                                         class="inline">
                                         @csrf
@@ -80,7 +79,6 @@
                                         </button>
                                     </form>
 
-                                    {{-- Resend Invite --}}
                                     <form method="POST" action="{{ route('admin.staff.resend-invite', $staff) }}"
                                         class="inline">
                                         @csrf
@@ -91,7 +89,7 @@
                                         </button>
                                     </form>
                                 </div>
-                            </td>
+                            </td> --}}
                         </tr>
                     @empty
                         <tr>

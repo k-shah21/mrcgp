@@ -25,7 +25,7 @@ class CheckRole
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
-            return redirect()->route('admin.login')
+            return redirect()->route('login')
                 ->with('error', 'Your account has been deactivated. Please contact an administrator.');
         }
 

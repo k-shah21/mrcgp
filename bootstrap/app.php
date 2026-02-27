@@ -23,8 +23,8 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->redirectUsersTo(function (Request $request) {
             $user = $request->user();
-            if ($user && $user->role === 'staff') {
-                return route('admin.applications.index');
+            if ($user && $user->role == 'staff') {
+                return route('user.applications.index');
             }
             return route('admin.dashboard');
         });
