@@ -34,7 +34,7 @@ class CheckEligibilityRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'passportNumber.required' => 'Please provide your passport number to proceed with the eligibility check.',
+            'passportNumber.required' => 'Please provide your passport ID as per country government to proceed with the eligibility check.',
             'passportNumber.max' => 'The passport number provided is too long. Please ensure it matches your physical passport exactly.',
             'candidateType.required' => 'Please indicate whether you are a New or Old Candidate so we can process your request correctly.',
             'candidateType.in' => 'The selected candidate type is unrecognized. Please select a valid candidate option (New or Old).',
