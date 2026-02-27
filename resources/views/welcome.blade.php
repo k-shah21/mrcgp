@@ -93,7 +93,7 @@
                                                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                                                 <path d="m9 12 2 2 4-4" />
                                             </svg>
-                                            STEP 1: ELIGIBILITY CHECK
+                                            Personal Information
                                         </div>
                                     </div>
                                     <div class="overflow-hidden text-sm px-4 pt-4 pb-6 bg-white space-y-6">
@@ -211,14 +211,14 @@
 
                                                 <div class="space-y-2" id="passport-number-container">
                                                     <label class="text-sm font-medium leading-none"
-                                                        for="step1-passportNumber">Passport Number <span
+                                                        for="step1-passportNumber">Passport ID as per country government <span
                                                             class="text-red-500">*</span></label>
                                                     <p class="text-[0.8rem] text-muted-foreground">
-                                                        Primary passport number
+                                                        Primary passport ID as per country government
                                                     </p>
                                                     <input type="text"
                                                         class="flex h-9 w-full rounded-md border px-3 py-1 text-base shadow-sm transition-colors md:text-sm bg-slate-50 border-slate-200 focus-visible:ring-indigo-500"
-                                                        placeholder="Enter passport number" name="passportNumber"
+                                                        placeholder="Enter passport ID as per country government" name="passportNumber"
                                                         id="step1-passportNumber" value="" required>
                                                 </div>
                                             </div>
@@ -328,7 +328,7 @@
                                         </div>
 
                                         <div class="space-y-2 flex flex-col justify-between">
-                                            <label class="text-sm font-medium leading-none pt-1" for="previousAttempts">No.
+                                            <label class="text-sm font-medium leading-none pt-8" for="previousAttempts">No.
                                                 of previous AKTs attempts <span class="text-red-500">*</span></label>
                                             <select name="previousAttempts" id="previousAttempts"
                                                 class="flex h-9 w-full rounded-md border px-3 py-1 text-base shadow-sm transition-colors md:text-sm bg-slate-50 border-slate-200 focus-visible:ring-indigo-500">
@@ -1146,7 +1146,7 @@
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                 </path>
             </svg>
-            <h3 class="text-xl font-bold text-slate-800 tracking-tight">Checking Eligibility...</h3>
+            <h3 class="text-xl font-bold text-slate-800 tracking-tight">Validating data...</h3>
             <p class="text-slate-500 mt-2 text-center text-sm">Please wait while we verify your details.</p>
         </div>
     </div>
@@ -1848,7 +1848,7 @@
                 'lastName': { required: true, label: 'Last Name is required' },
                 'fullNameOnRecord': { required: true, label: 'Full name as you would like it on record is required' },
                 'email': { required: true, label: 'Email is required', email: true, emailMsg: 'Invalid email address' },
-                'step1-passportNumber': { required: true, label: 'Passport Number is required' },
+                'step1-passportNumber': { required: true, label: 'Passport ID as per country government is required' },
                 'step1-candidateId': { required: false, label: 'Candidate ID is required', conditional: () => currentCandidateType === 'old' },
                 'whatsappNumber': { required: true, label: 'WhatsApp number is required' },
                 'emergencyContactNumber': { required: true, label: 'Emergency contact number is required' },
@@ -2026,7 +2026,7 @@
                         step1Errors['email'] = ['The email address you entered does not look valid. Please use a format like name@example.com.'];
                     }
                     const passportVal = document.getElementById('step1-passportNumber').value.trim();
-                    if (!passportVal) step1Errors['passportNumber'] = ['Please provide your Passport Number exactly as it appears on your passport.'];
+                    if (!passportVal) step1Errors['passportNumber'] = ['Please provide your Passport ID as per country government.'];
 
                     // if (currentCandidateType === 'old') {
                     //     const candId = document.getElementById('step1-candidateId').value.trim();
@@ -2041,7 +2041,7 @@
 
                     // *** REAL BACKEND ELIGIBILITY CHECK ***
                     Swal.fire({
-                        title: 'Checking Eligibility...',
+                        title: 'Validating data...',
                         html: '<div class="flex flex-col items-center"><p class="text-slate-500 mt-2">Please wait while we verify your details.</p></div>',
                         allowOutsideClick: false,
                         allowEscapeKey: false,

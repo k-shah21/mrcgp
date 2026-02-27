@@ -219,7 +219,7 @@
 
                     // Show SweetAlert loading
                     Swal.fire({
-                        title: 'Checking Eligibility...',
+                        title: 'Validating data...',
                         html: 'Please wait while we verify your details.',
                         allowOutsideClick: false,
                         allowEscapeKey: false,
