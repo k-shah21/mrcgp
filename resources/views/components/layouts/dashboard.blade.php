@@ -29,10 +29,12 @@
     <div class="min-h-screen flex bg-slate-50">
 
         {{-- Sidebar --}}
-        <aside class="hidden md:flex md:flex-col w-64 shrink-0 bg-slate-950 text-slate-100 border-r border-slate-800 sticky top-0 h-screen overflow-hidden self-start">
+        <aside
+            class="hidden md:flex md:flex-col w-64 shrink-0 bg-slate-950 text-slate-100 border-r border-slate-800 sticky top-0 h-screen overflow-hidden self-start">
             <div class="flex h-16 items-center px-5 border-b border-slate-800/80">
                 <div class="flex items-center gap-x-3">
-                    <div class="h-9 w-9 rounded-2xl bg-indigo-500 text-white flex items-center justify-center text-sm font-semibold shadow-sm">
+                    <div
+                        class="h-9 w-9 rounded-2xl bg-indigo-500 text-white flex items-center justify-center text-sm font-semibold shadow-sm">
                         MRC
                     </div>
                     <div>
@@ -45,8 +47,16 @@
             <nav class="mt-4 flex-1 px-3 space-y-1 overflow-y-auto">
                 @php
                     $navItems = [
-                        ['label' => 'Dashboard', 'icon' => 'ri-dashboard-3-line', 'route' => 'admin.applications.index'],
-                        // ['label' => 'Applications', 'icon' => 'ri-file-list-3-line', 'route' => 'admin.applications.index'],
+                        [
+                            'label' => 'Dashboard',
+                            'icon' => 'ri-dashboard-3-line',
+                            'route' => 'admin.dashboard',
+                        ],
+                        [
+                            'label' => 'Applications',
+                            'icon' => 'ri-file-list-3-line',
+                            'route' => 'admin.applications.index',
+                        ],
                     ];
                 @endphp
 
@@ -57,7 +67,8 @@
                     <a href="{{ route($item['route']) }}"
                         class="group flex items-center gap-x-3 rounded-xl px-3 py-2 text-sm font-medium transition
                             {{ $isActive ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800/70 hover:text-white' }}">
-                        <span class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-slate-800 text-lg font-normal text-slate-200 group-hover:bg-slate-700">
+                        <span
+                            class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-slate-800 text-lg font-normal text-slate-200 group-hover:bg-slate-700">
                             <i class="{{ $item['icon'] }}"></i>
                         </span>
                         <span class="truncate">{{ $item['label'] }}</span>
@@ -65,8 +76,8 @@
                 @endforeach
             </nav>
 
-            <div class="border-t border-slate-800/80 px-4 py-4">
-                <div class="flex items-center gap-x-3">
+            <div class="border-t border-slate-800/80 px-4 py-2">
+                {{-- <div class="flex items-center gap-x-3">
                     <div class="h-9 w-9 rounded-full bg-slate-800 flex items-center justify-center text-xs font-medium text-slate-200">
                         AD
                     </div>
@@ -74,17 +85,30 @@
                         <p class="text-sm font-medium">Admin</p>
                         <p class="text-[11px] text-slate-400">admin@mrcgp.org</p>
                     </div>
-                </div>
+                </div> --}}
+
+                <form method="POST" action="{{ route('admin.logout') }}" class="w-full">
+                    @csrf
+                    <button type="submit"
+                        class="w-full group flex items-center gap-x-3 rounded-xl px-3 py-2 text-sm font-medium transition text-slate-300 hover:bg-slate-800/70 hover:text-white">
+                        <span
+                            class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-slate-800 text-lg font-normal text-slate-200 group-hover:bg-slate-700">
+                            <i class="ri-logout-box-r-line text-rose-400/90 group-hover:text-rose-400"></i>
+                        </span>
+                        <span class="truncate text-rose-400/90 group-hover:text-rose-400">Logout</span>
+                    </button>
+                </form>
             </div>
         </aside>
 
         {{-- Main Content --}}
         <div class="flex-1 flex flex-col min-h-screen">
             {{-- Navbar --}}
-            <header class="sticky top-0 z-30 flex h-16 items-center gap-x-4 border-b border-slate-200 bg-white/90 backdrop-blur-sm px-4 lg:px-8">
+            <header
+                class="sticky top-0 z-30 flex h-16 items-center gap-x-4 border-b border-slate-200 bg-white/90 backdrop-blur-sm px-4 lg:px-8">
                 <div>
                     <h1 class="text-sm font-semibold text-slate-900">{{ $title ?? 'Dashboard' }}</h1>
-                    @if(isset($description))
+                    @if (isset($description))
                         <p class="text-[11px] text-slate-500">{{ $description }}</p>
                     @endif
                 </div>
@@ -99,7 +123,7 @@
     @stack('scripts')
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             @if (session('success'))
                 Swal.fire({
                     toast: true,

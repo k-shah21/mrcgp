@@ -227,14 +227,14 @@ class ApplicationController extends Controller
     public function preview(Request $request)
     {
         $data = $request->all();
-        
+
         // Handle full name logic similar to store
         if (empty($data['fullNameOnRecord'])) {
             $data['fullNameOnRecord'] = trim(($data['usualForename'] ?? '') . ' ' . ($data['lastName'] ?? ''));
         }
 
         $pdf = Pdf::loadView('pdf.application', $data);
-        
+
         return $pdf->stream('application-preview.pdf');
     }
 
@@ -243,20 +243,10 @@ class ApplicationController extends Controller
     // ─────────────────────────────────────────────
 
     /**
-     * Admin – list applications with search, filter, stats.
+     * Admin – dashboard with stats and charts.
      */
-    public function adminIndex(Request $request)
+    public function dashboard(Request $request)
     {
-        $search = $request->input('search');
-        $status = $request->input('status');
-        $type = $request->input('type');
-
-        $query = Application::query()
-            ->search($search)
-            ->when($status, fn($q, $s) => $q->where('status', $s))
-            ->when($type, fn($q, $t) => $q->where('candidateType', $t))
-            ->latest();
-
         // Stats
         $stats = [
             'total' => Application::count(),
@@ -283,16 +273,35 @@ class ApplicationController extends Controller
             'colors' => ['#f59e0b', '#10b981', '#ef4444'],
         ];
 
+        return view('admin.dashboard', compact(
+            'stats',
+            'timeChartData',
+            'statusChartData'
+        ));
+    }
+
+    /**
+     * Admin – list applications with search, filter, stats.
+     */
+    public function adminIndex(Request $request)
+    {
+        $search = $request->input('search');
+        $status = $request->input('status');
+        $type = $request->input('type');
+
+        $query = Application::query()
+            ->search($search)
+            ->when($status, fn($q, $s) => $q->where('status', $s))
+            ->when($type, fn($q, $t) => $q->where('candidateType', $t))
+            ->latest();
+
         $applications = $query->paginate(15)->withQueryString();
 
         return view('admin.applications.index', compact(
             'applications',
-            'stats',
             'search',
             'status',
-            'type',
-            'timeChartData',
-            'statusChartData'
+            'type'
         ));
     }
 
