@@ -22,6 +22,49 @@ class ApplicationController extends Controller
     // ─────────────────────────────────────────────
 
     /**
+     * Show the candidate check form
+     */
+    public function showCheckCandidateForm()
+    {
+        return view('check-candidate');
+    }
+
+    /**
+     * Check if a candidate exists
+     */
+    public function checkCandidateStatus(Request $request)
+    {
+        $request->validate([
+            'candidate_id' => 'required|string|max:255'
+        ], [
+            'candidate_id.required' => 'Please provide a Candidate ID.'
+        ]);
+
+        $candidateId = trim($request->candidate_id);
+
+        $application = Application::where('candidateId', $candidateId)
+            ->orWhere('passportNumber', $candidateId)
+            ->first();
+
+        if ($application) {
+            $status = ucfirst($application->status ?? 'pending');
+            $name = trim($application->usualForename . ' ' . $application->lastName);
+            return back()->with('success', "Candidate found! Name: {$name}, Status: {$status}");
+        }
+
+        $oldCandidate = OldCandidate::where('candidate_id', $candidateId)
+            ->orWhere('passportNumber', $candidateId)
+            ->first();
+
+        if ($oldCandidate) {
+            $name = trim($oldCandidate->usualForename . ' ' . $oldCandidate->lastName);
+            return back()->with('success', "Candidate found in historical records. Name: {$name}. No active application exists.");
+        }
+
+        return back()->with('error', "No candidate found with the provided ID or Passport Number. Please check the ID and try again.");
+    }
+
+    /**
      * Step 1 – AJAX eligibility / duplicate check.
      */
     public function checkEligibility(CheckEligibilityRequest $request): JsonResponse
@@ -39,12 +82,12 @@ class ApplicationController extends Controller
             if (!$existing) {
                 return response()->json([
                     'status' => 'error',
-                    'errors' => ['candidateId' => ['We could not find an old candidate matching this ID. Please double check the ID and try again.']],
+                    'errors' => ['candidateId' => ['We could not find an registered candidate matching this ID. Please double check the ID and try again.']],
                 ], 422);
             }
 
             $duration = microtime(true) - $startTime;
-            Log::info('Old candidate verified', ['duration' => $duration]);
+            Log::info('Registered candidate verified', ['duration' => $duration]);
 
             return response()->json([
                 'status' => 'success',
@@ -271,9 +314,8 @@ class ApplicationController extends Controller
             'rejected' => Application::rejected()->count(),
         ];
 
-        // Charts – registrations over last 7 days
+        // Charts – registrations over all-time
         $timeChartData = Application::selectRaw('DATE(created_at) as date, COUNT(*) as count')
-            ->where('created_at', '>=', now()->subDays(7))
             ->groupBy('date')
             ->orderBy('date')
             ->get();

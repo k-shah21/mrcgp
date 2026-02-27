@@ -36,7 +36,7 @@ class CheckEligibilityRequest extends FormRequest
         return [
             'passportNumber.required' => 'Please provide your passport ID as per country government to proceed with the eligibility check.',
             'passportNumber.max' => 'The passport number provided is too long. Please ensure it matches your physical passport exactly.',
-            'candidateType.required' => 'Please indicate whether you are a New or Old Candidate so we can process your request correctly.',
+            'candidateType.required' => 'Please indicate whether you are a New or Registered Candidate so we can process your request correctly.',
             'candidateType.in' => 'The selected candidate type is unrecognized. Please select a valid candidate option (New or Old).',
             'email.required' => 'An email address is mandatory. We need it to communicate important updates regarding your application.',
             'email.email' => 'The email address format appears to be incorrect. Please provide a structurally valid email (e.g., name@example.com).',
@@ -45,7 +45,7 @@ class CheckEligibilityRequest extends FormRequest
             'usualForename.max' => 'The Usual Forename provided exceeds the character limit. Please shorten it to proceed.',
             'lastName.required' => 'Your Last Name is missing. Please provide it exactly as it appears on your official documents.',
             'lastName.max' => 'The Last Name provided exceeds the character limit. Please shorten it to proceed.',
-            'candidateId.required' => 'A Candidate ID is required for old candidates. Please enter your existing ID to continue.',
+            'candidateId.required' => 'A Candidate ID is required for registered candidates. Please enter your existing ID to continue.',
             'candidateId.string' => 'The Candidate ID provided is in an invalid format. It should be a text string.',
             'candidateId.size' => 'Your Candidate ID must be exactly 7 characters long. Please check your records and enter the correct 7-character ID.',
         ];

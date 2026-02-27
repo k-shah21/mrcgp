@@ -71,8 +71,10 @@
                             </div>
                         </div>
                     </div>
-                    <div class="px-4 py-2 bg-indigo-100 rounded-md text-indigo-700 font-medium text-sm">
-                        May 2026 AKT Exam</div>
+                    <div class="flex items-center gap-2">
+                        <div class="px-4 py-2 bg-indigo-100 rounded-md text-indigo-700 font-medium text-sm">May 2026 AKT Exam</div> 
+                        <a href="{{ route('candidate.check.form') }}" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary shadow hover:bg-primary/90 h-10 px-6 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white transition-all duration-200 transform hover:scale-105">Check Candidate</a>
+                    </div>
                 </div>
             </div>
             <div class="p-6">
@@ -137,7 +139,7 @@
                                                     <input type="hidden" name="candidateType" value="old" disabled>
                                                     <label
                                                         class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer text-slate-700 pointer-events-none"
-                                                        for="radio-old">Old Candidate</label>
+                                                        for="radio-old">Registered Candidate</label>
                                                 </div>
                                             </div>
                                         </div>
@@ -417,7 +419,7 @@
                                                             5MB)</p>
                                                     </div>
                                                     <input id="passport-image" name="passportImage" type="file"
-                                                        class="hidden" accept=".png, .jpg, .jpeg">
+                                                        class="hidden" accept=".png, .jpg, .jpeg, .pdf">
                                                 </label>
                                             </div>
                                         </div>
@@ -899,7 +901,7 @@
                                                                             (MAX. 3MB)</p>
                                                                     </div>
                                                                     <input id="signature-upload" type="file"
-                                                                        class="hidden" accept=".png, .jpg, .jpeg"
+                                                                        class="hidden" accept=".png, .jpg, .jpeg, .pdf"
                                                                         name="signatureUpload">
                                                                 </label>
                                                             </div>
@@ -2052,7 +2054,7 @@
                     if (isOld) {
                         const candId = document.getElementById('step1-candidateId').value.trim();
                         if (!candId) {
-                            step1Errors['candidateId'] = ['Candidate ID is required for old candidates. Please enter your 7-digit ID.'];
+                            step1Errors['candidateId'] = ['Candidate ID is required for registered candidates. Please enter your 7-digit ID.'];
                         } else if (candId.length !== 7) {
                             step1Errors['candidateId'] = ['The Candidate ID you entered is invalid. It must be exactly 7 digits long.'];
                         }

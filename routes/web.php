@@ -24,6 +24,10 @@ Route::post('/apply', [ApplicationController::class, 'store'])
     ->name('application.store');
 Route::post('/preview-application', [ApplicationController::class, 'preview'])
     ->name('application.preview');
+Route::get('/check-candidate', [ApplicationController::class, 'showCheckCandidateForm'])
+    ->name('candidate.check.form');
+Route::post('/check-candidate', [ApplicationController::class, 'checkCandidateStatus'])
+    ->name('candidate.check');
 
 // ------------- admin auth & pages ------------------------------------------------
 // Admin login/logout handled by a bespoke controller; protects the dashboard
