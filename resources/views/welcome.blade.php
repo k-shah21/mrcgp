@@ -29,7 +29,15 @@
         .phone-country-dropdown .country-option .dial { color: #6366f1; font-weight: 500; margin-left: auto; }
 
         /* Dropzone Custom Styling */
-        .dropzone { border: 2px dashed #cbd5e1 !important; border-radius: 0.5rem !important; background: #f8fafc !important; min-height: 120px !important; padding: 1rem !important; display: flex !important; flex-wrap: wrap !important; gap: 1rem !important; align-items: center !important; justify-content: center !important; transition: all 0.2s ease !important; }
+        .dropzone { border: 2px dashed #cbd5e1 !important; border-radius: 0.5rem !important; background: #f8fafc !important; height: 160px !important; min-height: 160px !important; max-height: 160px !important; padding: 1rem !important; display: flex !important; flex-wrap: wrap !important; gap: 1rem !important; align-items: flex-start !important; justify-content: center !important; transition: all 0.2s ease !important; overflow-y: auto !important; overflow-x: hidden !important; }
+        .dropzone.dz-single { overflow-y: hidden !important; }
+        .dropzone:not(.dz-started) { align-items: center !important; }
+        .dropzone .dz-preview { margin: 0 !important; width: 100% !important; max-width: 120px !important; }
+        .dropzone .dz-preview .dz-image { width: 120px !important; height: 120px !important; }
+        .dropzone::-webkit-scrollbar { width: 6px; }
+        .dropzone::-webkit-scrollbar-track { background: transparent; }
+        .dropzone::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dropzone::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         .dropzone:hover { background: #f1f5f9 !important; border-color: #6366f1 !important; }
         .dropzone.dz-drag-hover { background: #eef2ff !important; border-color: #6366f1 !important; }
         .dropzone.dz-started .dz-message { display: none !important; }
@@ -269,7 +277,7 @@
                                                     <span class="text-red-500">*</span>
                                                 </label>
                                                 <div class="bg-slate-50 border border-slate-200 rounded-md focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2">
-                                                    <div class="flex h-10 w-full rounded-md bg-transparent text-sm PhoneInput" id="whatsapp-phone-wrapper">
+                                                    <div class="flex h-10 w-full rounded-md bg-transparent text-sm PhoneInput pt-[1px]" id="whatsapp-phone-wrapper">
                                                         <div class="relative">
                                                             <button class="items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 py-2 flex gap-1 rounded-e-none rounded-s-lg border-r-0 px-3 focus:z-10" type="button" onclick="toggleCountryDropdown('whatsapp')">
                                                                 <span class="flex h-4 w-6 overflow-hidden rounded-sm bg-foreground/20" id="whatsapp-flag"></span>
@@ -288,7 +296,7 @@
                                                     <span class="text-red-500">*</span>
                                                 </label>
                                                 <div class="bg-slate-50 border border-slate-200 rounded-md focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2">
-                                                    <div class="flex h-10 w-full rounded-md bg-transparent text-sm PhoneInput" id="emergency-phone-wrapper">
+                                                    <div class="flex h-10 w-full rounded-md bg-transparent text-sm PhoneInput pt-[1px]" id="emergency-phone-wrapper">
                                                         <div class="relative">
                                                             <button class="items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 py-2 flex gap-1 rounded-e-none rounded-s-lg border-r-0 px-3 focus:z-10" type="button" onclick="toggleCountryDropdown('emergency')">
                                                                 <span class="flex h-4 w-6 overflow-hidden rounded-sm bg-foreground/20" id="emergency-flag"></span>
@@ -304,22 +312,23 @@
                                             </div>
                                             
                                         </div>
-
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div class="space-y-2">
                                             <label class="text-sm font-medium leading-none" for="fullNameOnRecord">Full
                                                 name as you would like it on record
-                                                <span class="text-red-500">*</span>
+                                                <span class="text-red-500">*</span> 
                                             </label>
-                                            <p class="text-[0.8rem] text-muted-foreground">This name will be used on
+                                            <p class="!text-[0.8rem] text-muted-foreground !font-normal">This name will be used on
                                                 official documents</p>
+                                            
                                             <input
                                                 class="flex h-9 w-full rounded-md border px-3 py-1 text-base shadow-sm transition-colors md:text-sm bg-slate-50 border-slate-200 focus-visible:ring-indigo-500"
                                                 placeholder="Enter full name for record" name="fullNameOnRecord"
                                                 id="fullNameOnRecord" value="">
                                         </div>
 
-                                        <div class="space-y-2">
-                                            <label class="text-sm font-medium leading-none" for="previousAttempts">No.
+                                        <div class="space-y-2 flex flex-col justify-between">
+                                            <label class="text-sm font-medium leading-none pt-1" for="previousAttempts">No.
                                                 of previous AKTs attempts <span class="text-red-500">*</span></label>
                                             <select name="previousAttempts" id="previousAttempts"
                                                 class="flex h-9 w-full rounded-md border px-3 py-1 text-base shadow-sm transition-colors md:text-sm bg-slate-50 border-slate-200 focus-visible:ring-indigo-500">
@@ -333,7 +342,7 @@
                                                 <option value="5+">5+</option>
                                             </select>
                                         </div>
-
+                                        </div>
                                         <div class="space-y-4 mt-6">
                                             <h4 class="text-sm font-semibold text-slate-700">Residential Address
                                             </h4>
@@ -531,7 +540,7 @@
                                                     aria-describedby="registrationNumber-description"
                                                     aria-invalid="false" value="">
                                             </div>
-                                            <div class="space-y-2 flex flex-col">
+                                            <div class="space-y-2 flex flex-col justify-between">
                                                 <label
                                                     class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                                                     for="registrationDate">Date of full registration
@@ -902,52 +911,52 @@
 
                                             </div>
                                         </div>
-                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
                                             <div class="space-y-2" data-doc="passport_bio">
-                                            <label
-                                                class="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-sm font-medium">
-                                                Passport Bio Page (Valid)
-                                                <span class="text-red-500">*</span>
-                                            </label>
-                                            <div class="flex items-center justify-center w-full">
-                                                <label for="passport_bio_page"
-                                                    class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50  border-slate-300 hover:bg-slate-100 ">
-                                                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                            stroke-width="2" stroke-linecap="round"
-                                                            stroke-linejoin="round"
-                                                            class="lucide lucide-upload w-8 h-8 mb-2 text-slate-500">
-                                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4">
-                                                            </path>
-                                                            <polyline points="17 8 12 3 7 8"></polyline>
-                                                            <line x1="12" x2="12" y1="3" y2="15"></line>
-                                                        </svg>
-                                                        <p class="mb-2 text-sm text-slate-500">
-                                                            <span class="font-semibold">Click to upload</span>
-                                                            passport bio page
-                                                        </p>
-                                                        <p class="text-xs text-slate-500">
-                                                            JPG, JPEG, PNG (MAX. 3MB), PDF (MAX. 5MB)
-                                                        </p>
-                                                    </div>
-                                                    <input id="passport_bio_page" type="file" class="hidden"
-                                                        accept=".png, .jpg, .jpeg, .pdf" name="passport_bio_page">
+                                                <label
+                                                    class="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-sm font-medium">
+                                                    Passport Bio Page (Valid)
+                                                    <span class="text-red-500">*</span>
                                                 </label>
+                                                <div class="flex items-center justify-center w-full">
+                                                    <label for="passport_bio_page"
+                                                        class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50  border-slate-300 hover:bg-slate-100 ">
+                                                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                                stroke-width="2" stroke-linecap="round"
+                                                                stroke-linejoin="round"
+                                                                class="lucide lucide-upload w-8 h-8 mb-2 text-slate-500">
+                                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4">
+                                                                </path>
+                                                                <polyline points="17 8 12 3 7 8"></polyline>
+                                                                <line x1="12" x2="12" y1="3" y2="15"></line>
+                                                            </svg>
+                                                            <p class="mb-2 text-sm text-slate-500">
+                                                                <span class="font-semibold">Click to upload</span>
+                                                                passport bio page
+                                                            </p>
+                                                            <p class="text-xs text-slate-500">
+                                                                JPG, JPEG, PNG (MAX. 3MB), PDF (MAX. 5MB)
+                                                            </p>
+                                                        </div>
+                                                        <input id="passport_bio_page" type="file" class="hidden"
+                                                            accept=".png, .jpg, .jpeg, .pdf" name="passport_bio_page">
+                                                    </label>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="space-y-2" data-doc="valid_license">
-                                            <label
-                                                class="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-sm font-medium">
-                                                Valid License
-                                                <span class="text-red-500">*</span>
-                                            </label>
-                                            <div class="flex items-center justify-center w-full">
-                                                <label for="valid-license"
-                                                    class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50  border-slate-300 hover:bg-slate-100 ">
-                                                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            <div class="space-y-2" data-doc="valid_license">
+                                                <label
+                                                    class="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-sm font-medium">
+                                                    Valid License
+                                                    <span class="text-red-500">*</span>
+                                                </label>
+                                                <div class="flex items-center justify-center w-full">
+                                                    <label for="valid-license"
+                                                        class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50  border-slate-300 hover:bg-slate-100 ">
+                                                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                                             stroke-width="2" stroke-linecap="round"
                                                             stroke-linejoin="round"
                                                             class="lucide lucide-upload w-8 h-8 mb-2 text-slate-500">
@@ -965,142 +974,141 @@
                                                         </p>
                                                     </div><input id="valid-license" type="file" class="hidden"
                                                         accept=".png, .jpg, .jpeg, .pdf" name="valid_license">
-                                                </label>
+                                                    </label>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="space-y-2" data-doc="mbbs_degree">
-                                            <label
-                                                class="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-sm font-medium">MBBS
-                                                Degree <span class="text-red-500">*</span>
-                                            </label>
-                                            <div class="flex items-center justify-center w-full">
-                                                <label for="mbbs-degree"
-                                                    class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50  border-slate-300 hover:bg-slate-100">
-                                                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                            stroke-width="2" stroke-linecap="round"
-                                                            stroke-linejoin="round"
-                                                            class="lucide lucide-upload w-8 h-8 mb-2 text-slate-500">
-                                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4">
-                                                            </path>
-                                                            <polyline points="17 8 12 3 7 8"></polyline>
-                                                            <line x1="12" x2="12" y1="3" y2="15"></line>
-                                                        </svg>
-                                                        <p class="mb-2 text-sm text-slate-500">
-                                                            <span class="font-semibold">Click to upload</span>
-                                                            MBBS degree
-                                                        </p>
-                                                        <p class="text-xs text-slate-500">
-                                                            JPG, JPEG, PNG (MAX. 3MB), PDF (MAX. 5MB)
-                                                        </p>
-                                                    </div>
-                                                    <input id="mbbs-degree" type="file" class="hidden"
-                                                        accept=".png, .jpg, .jpeg, .pdf" name="mbbs_degree">
+                                            <div class="space-y-2" data-doc="mbbs_degree">
+                                                <label
+                                                    class="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-sm font-medium">MBBS
+                                                    Degree <span class="text-red-500">*</span>
                                                 </label>
+                                                <div class="flex items-center justify-center w-full">
+                                                    <label for="mbbs-degree"
+                                                        class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50  border-slate-300 hover:bg-slate-100">
+                                                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                                stroke-width="2" stroke-linecap="round"
+                                                                stroke-linejoin="round"
+                                                                class="lucide lucide-upload w-8 h-8 mb-2 text-slate-500">
+                                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4">
+                                                                </path>
+                                                                <polyline points="17 8 12 3 7 8"></polyline>
+                                                                <line x1="12" x2="12" y1="3" y2="15"></line>
+                                                            </svg>
+                                                            <p class="mb-2 text-sm text-slate-500">
+                                                                <span class="font-semibold">Click to upload</span>
+                                                                MBBS degree
+                                                            </p>
+                                                            <p class="text-xs text-slate-500">
+                                                                JPG, JPEG, PNG (MAX. 3MB), PDF (MAX. 5MB)
+                                                            </p>
+                                                        </div>
+                                                        <input id="mbbs-degree" type="file" class="hidden"
+                                                            accept=".png, .jpg, .jpeg, .pdf" name="mbbs_degree">
+                                                    </label>
+                                                </div>
                                             </div>
-                                        </div>
-
-                                        <div class="space-y-2" data-doc="internship">
-                                            <div class="flex items-center justify-between"><label
-                                                    class="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-sm font-medium">Internship/House
-                                                    Job Certificate <span class="text-red-500">*</span></label><span
-                                                    class="text-xs text-slate-500">At least
-                                                    1 required</span></div><label for="internship-certificate-new-0"
-                                                class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50  border-slate-300 hover:bg-slate-100 transition-colors">
-                                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                                    <div class="flex items-center gap-2 mb-2"><svg
-                                                            xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                            stroke-width="2" stroke-linecap="round"
-                                                            stroke-linejoin="round"
-                                                            class="lucide lucide-upload w-6 h-6 text-slate-500">
-                                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4">
-                                                            </path>
-                                                            <polyline points="17 8 12 3 7 8"></polyline>
-                                                            <line x1="12" x2="12" y1="3" y2="15"></line>
-                                                        </svg></div>
-                                                    <p class="mb-2 text-sm text-slate-500">
-                                                        <span class="font-semibold">Click to
-                                                            upload</span>
-                                                        internship certificate
-                                                    </p>
-                                                    <p class="text-xs text-slate-500">JPG,
-                                                        JPEG, PNG (MAX. 3MB), PDF (MAX. 5MB)</p>
-                                                </div><input id="internship-certificate-new-0" type="file"
-                                                    class="hidden" accept=".png, .jpg, .jpeg, .pdf"
-                                                    name="internship_certificates[]">
-                                            </label>
-                                        </div>
-                                        <div class="space-y-2" data-doc="training">
-                                            <label
-                                                class="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-sm font-medium">Training/Diploma
-                                                Certificate <span class="text-red-500">*</span>
-                                            </label>
-                                            <div class="flex items-center justify-center w-full">
-                                                <label for="training-certificate"
-                                                    class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50  border-slate-300 hover:bg-slate-100 ">
+                                            <div class="space-y-2" data-doc="internship">
+                                                <div class="flex items-center justify-between"><label
+                                                        class="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-sm font-medium">Internship/House
+                                                        Job Certificate <span class="text-red-500">*</span></label><span
+                                                        class="text-xs text-slate-500">At least
+                                                        1 required</span></div><label for="internship-certificate-new-0"
+                                                    class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50  border-slate-300 hover:bg-slate-100 transition-colors">
                                                     <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                            stroke-width="2" stroke-linecap="round"
-                                                            stroke-linejoin="round"
-                                                            class="lucide lucide-upload w-8 h-8 mb-2 text-slate-500">
-                                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4">
-                                                            </path>
-                                                            <polyline points="17 8 12 3 7 8"></polyline>
-                                                            <line x1="12" x2="12" y1="3" y2="15"></line>
-                                                        </svg>
+                                                        <div class="flex items-center gap-2 mb-2"><svg
+                                                                xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                                stroke-width="2" stroke-linecap="round"
+                                                                stroke-linejoin="round"
+                                                                class="lucide lucide-upload w-6 h-6 text-slate-500">
+                                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4">
+                                                                </path>
+                                                                <polyline points="17 8 12 3 7 8"></polyline>
+                                                                <line x1="12" x2="12" y1="3" y2="15"></line>
+                                                            </svg></div>
                                                         <p class="mb-2 text-sm text-slate-500">
                                                             <span class="font-semibold">Click to
                                                                 upload</span>
-                                                            training certificate
+                                                            internship certificate
                                                         </p>
-                                                        <p class="text-xs text-slate-500">
-                                                            JPG, JPEG, PNG (MAX. 3MB), PDF (MAX. 5MB)
+                                                        <p class="text-xs text-slate-500">JPG,
+                                                            JPEG, PNG (MAX. 3MB), PDF (MAX. 5MB)</p>
+                                                    </div><input id="internship-certificate-new-0" type="file"
+                                                        class="hidden" accept=".png, .jpg, .jpeg, .pdf"
+                                                        name="internship_certificates[]">
+                                                </label>
+                                            </div>
+                                            <div class="space-y-2" data-doc="training">
+                                                <label
+                                                    class="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-sm font-medium">Training/Diploma
+                                                    Certificate <span class="text-red-500">*</span>
+                                                </label>
+                                                <div class="flex items-center justify-center w-full">
+                                                    <label for="training-certificate"
+                                                        class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50  border-slate-300 hover:bg-slate-100 ">
+                                                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                                stroke-width="2" stroke-linecap="round"
+                                                                stroke-linejoin="round"
+                                                                class="lucide lucide-upload w-8 h-8 mb-2 text-slate-500">
+                                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4">
+                                                                </path>
+                                                                <polyline points="17 8 12 3 7 8"></polyline>
+                                                                <line x1="12" x2="12" y1="3" y2="15"></line>
+                                                            </svg>
+                                                            <p class="mb-2 text-sm text-slate-500">
+                                                                <span class="font-semibold">Click to
+                                                                    upload</span>
+                                                                training certificate
+                                                            </p>
+                                                            <p class="text-xs text-slate-500">
+                                                                JPG, JPEG, PNG (MAX. 3MB), PDF (MAX. 5MB)
+                                                            </p>
+                                                        </div><input id="training-certificate" type="file" class="hidden"
+                                                            accept=".png, .jpg, .jpeg, .pdf" name="training_certificate">
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="space-y-2" data-doc="experience">
+                                                <div class="flex items-center justify-between"><label
+                                                        class="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-sm font-medium">Experience
+                                                        Certificate(s) <span class="text-red-500">*</span></label><span
+                                                        class="text-xs text-slate-500">At least
+                                                        1 required</span></div><label for="experience-certificate-new-0"
+                                                    class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50  border-slate-300 hover:bg-slate-100  transition-colors">
+                                                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                                        <div class="flex items-center gap-2 mb-2"><svg
+                                                                xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                                stroke-width="2" stroke-linecap="round"
+                                                                stroke-linejoin="round"
+                                                                class="lucide lucide-upload w-6 h-6 text-slate-500">
+                                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4">
+                                                                </path>
+                                                                <polyline points="17 8 12 3 7 8"></polyline>
+                                                                <line x1="12" x2="12" y1="3" y2="15"></line>
+                                                            </svg></div>
+                                                        <p class="mb-2 text-sm text-slate-500">
+                                                            <span class="font-semibold">Click to
+                                                                upload</span>
+                                                            experience certificate
                                                         </p>
-                                                    </div><input id="training-certificate" type="file" class="hidden"
-                                                        accept=".png, .jpg, .jpeg, .pdf" name="training_certificate">
+                                                        <p class="text-xs text-slate-500">JPG,
+                                                            JPEG, PNG (MAX. 3MB), PDF (MAX. 5MB)</p>
+                                                    </div>
+                                                    <input id="experience-certificate-new-0" type="file" class="hidden"
+                                                        accept=".png, .jpg, .jpeg, .pdf" name="experience_certificates[]">
                                                 </label>
                                             </div>
                                         </div>
-                                        <div class="space-y-2" data-doc="experience">
-                                            <div class="flex items-center justify-between"><label
-                                                    class="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-sm font-medium">Experience
-                                                    Certificate(s) <span class="text-red-500">*</span></label><span
-                                                    class="text-xs text-slate-500">At least
-                                                    1 required</span></div><label for="experience-certificate-new-0"
-                                                class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-slate-50  border-slate-300 hover:bg-slate-100  transition-colors">
-                                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                                    <div class="flex items-center gap-2 mb-2"><svg
-                                                            xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                            stroke-width="2" stroke-linecap="round"
-                                                            stroke-linejoin="round"
-                                                            class="lucide lucide-upload w-6 h-6 text-slate-500">
-                                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4">
-                                                            </path>
-                                                            <polyline points="17 8 12 3 7 8"></polyline>
-                                                            <line x1="12" x2="12" y1="3" y2="15"></line>
-                                                        </svg></div>
-                                                    <p class="mb-2 text-sm text-slate-500">
-                                                        <span class="font-semibold">Click to
-                                                            upload</span>
-                                                        experience certificate
-                                                    </p>
-                                                    <p class="text-xs text-slate-500">JPG,
-                                                        JPEG, PNG (MAX. 3MB), PDF (MAX. 5MB)</p>
-                                                </div>
-                                                <input id="experience-certificate-new-0" type="file" class="hidden"
-                                                    accept=".png, .jpg, .jpeg, .pdf" name="experience_certificates[]">
-                                            </label>
-                                        </div>
-                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="flex flex-col sm:flex-row gap-4 justify-end pt-6">
+                                <div class="flex flex-col sm:flex-row gap-4 justify-end pt-6">
                                 <button
+                                    id="preview-action-btn"
                                     class="gap-2 whitespace-nowrap [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 shadow-sm inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
                                     type="button">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -1117,6 +1125,8 @@
                                     class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 bg-primary shadow hover:bg-primary/90 h-9 px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                                     type="submit">Submit</button>
                             </div>
+                            </div>
+                            
                         </div>
                     </div>
                 </form>
@@ -1443,7 +1453,7 @@
                 // Create Dropzone div
                 const dzDiv = document.createElement('div');
                 dzDiv.id = `dz-container-${id}`;
-                dzDiv.className = 'dropzone w-full transition-all duration-200';
+                dzDiv.className = 'dropzone w-full transition-all duration-200 flex-1';
                 dzDiv.setAttribute('data-target-id', id);
 
                 // Prepare message from original UI
@@ -1460,10 +1470,18 @@
                 // Insert Dropzone UI
                 placementTarget.insertAdjacentElement('afterend', dzDiv);
                 
+                // Ensure the parent container expands to fill grid height
+                const containerEl = input.closest('[data-doc]');
+                if (containerEl) {
+                    containerEl.classList.add('flex', 'flex-col', 'h-full');
+                }
+
                 // Configuration
-                const isMultiple = name.includes('[]') || id.includes('certificate') || id.includes('experience');
+                const isMultiple = (name === 'internship_certificates[]' || name === 'experience_certificates[]');
                 const maxFiles = isMultiple ? 10 : 1;
                 const acceptedFiles = input.accept || ".jpeg,.jpg,.png,.pdf";
+
+                if (!isMultiple) dzDiv.classList.add('dz-single');
 
                 try {
                     const dz = new Dropzone(dzDiv, {
@@ -1564,6 +1582,13 @@
                                 else this.on("thumbnail", function(f) { setupActions(f); });
                             });
                             this.on("error", function(file, message) {
+                                // Ignore max files exceeded error for single-file inputs to allow replacement
+                                if (maxFiles === 1 && message === this.options.dictMaxFilesExceeded) {
+                                    file.accepted = true;
+                                    file.previewElement.classList.remove("dz-error");
+                                    file.previewElement.classList.add("dz-success");
+                                    return;
+                                }
                                 if (typeof message === 'string' && !message.includes('upload center')) {
                                     Swal.fire({ icon: 'error', title: 'Upload Issue', text: message });
                                     this.removeFile(file);
@@ -2082,6 +2107,48 @@
                             }
                         }
                     });
+                });
+            }
+
+            // ================================
+            // PREVIEW APPLICATION (PDF)
+            // ================================
+            const previewActionBtn = document.getElementById('preview-action-btn');
+            if (previewActionBtn) {
+                previewActionBtn.addEventListener('click', () => {
+                    const tempForm = document.createElement('form');
+                    tempForm.method = 'POST';
+                    tempForm.action = '/preview-application';
+                    tempForm.target = '_blank';
+                    
+                    const csrf = document.createElement('input');
+                    csrf.type = 'hidden';
+                    csrf.name = '_token';
+                    csrf.value = document.querySelector('input[name="_token"]').value;
+                    tempForm.appendChild(csrf);
+
+                    // Candidate type
+                    const typeInp = document.createElement('input');
+                    typeInp.type = 'hidden';
+                    typeInp.name = 'candidateType';
+                    typeInp.value = currentCandidateType;
+                    tempForm.appendChild(typeInp);
+
+                    // All form data
+                    const previewFormData = new FormData(form);
+                    for (let [key, value] of previewFormData.entries()) {
+                        if (typeof value === 'string' && key !== '_token') {
+                            const input = document.createElement('input');
+                            input.type = 'hidden';
+                            input.name = key;
+                            input.value = value;
+                            tempForm.appendChild(input);
+                        }
+                    }
+
+                    document.body.appendChild(tempForm);
+                    tempForm.submit();
+                    document.body.removeChild(tempForm);
                 });
             }
 

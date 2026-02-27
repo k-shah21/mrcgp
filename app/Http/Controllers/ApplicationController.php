@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ApplicationController extends Controller
 {
@@ -218,6 +219,23 @@ class ApplicationController extends Controller
                 'message' => 'We experienced a temporary issue while processing your application. No data was saved. Please wait a moment and try submitting again. If the issue persists, contact our support team.',
             ], 500);
         }
+    }
+
+    /**
+     * Preview application as PDF.
+     */
+    public function preview(Request $request)
+    {
+        $data = $request->all();
+        
+        // Handle full name logic similar to store
+        if (empty($data['fullNameOnRecord'])) {
+            $data['fullNameOnRecord'] = trim(($data['usualForename'] ?? '') . ' ' . ($data['lastName'] ?? ''));
+        }
+
+        $pdf = Pdf::loadView('pdf.application', $data);
+        
+        return $pdf->stream('application-preview.pdf');
     }
 
     // ─────────────────────────────────────────────

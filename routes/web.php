@@ -15,6 +15,8 @@ Route::post('/check-eligibility', [ApplicationController::class, 'checkEligibili
     ->name('application.check-eligibility');
 Route::post('/apply', [ApplicationController::class, 'store'])
     ->name('application.store');
+Route::post('/preview-application', [ApplicationController::class, 'preview'])
+    ->name('application.preview');
 
 // ------------- admin auth & pages ------------------------------------------------
 // Admin login/logout handled by a bespoke controller; protects the dashboard
