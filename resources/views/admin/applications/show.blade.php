@@ -1,8 +1,9 @@
 <x-layouts.dashboard title="Application Details" description="View candidate application">
+    @php $routePrefix = auth()->check() && auth()->user()->isAdmin() ? 'admin.' : 'user.'; @endphp
 
     {{-- Back Button --}}
     <div class="mb-6">
-        <a href="{{ route('admin.applications.index') }}"
+        <a href="{{ route($routePrefix . 'applications.index') }}"
             class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-slate-700 transition">
             <i class="ri-arrow-left-line text-sm"></i> Back to Applications
         </a>
@@ -430,7 +431,8 @@
             {{-- Approve Action --}}
             @if ($application->status !== 'approved' && $application->status !== 'rejected')
                 <x-card title="Approve Application" subtitle="Mark as approved">
-                    <form method="POST" action="{{ route('admin.applications.update-status', $application) }}"
+                    <form method="POST"
+                        action="{{ route($routePrefix . 'applications.update-status', $application) }}"
                         id="approve-form">
                         @csrf
                         @method('PATCH')
@@ -446,7 +448,8 @@
             {{-- Reject Action --}}
             @if ($application->status !== 'rejected' && $application->status !== 'approved')
                 <x-card title="Reject Application" subtitle="Decline this application">
-                    <form method="POST" action="{{ route('admin.applications.update-status', $application) }}"
+                    <form method="POST"
+                        action="{{ route($routePrefix . 'applications.update-status', $application) }}"
                         id="reject-form">
                         @csrf
                         @method('PATCH')
@@ -491,7 +494,8 @@
             {{-- Reset to Pending --}}
             @if ($application->status !== 'pending')
                 <x-card title="Reset" subtitle="Set back to pending">
-                    <form method="POST" action="{{ route('admin.applications.update-status', $application) }}"
+                    <form method="POST"
+                        action="{{ route($routePrefix . 'applications.update-status', $application) }}"
                         id="reset-form">
                         @csrf
                         @method('PATCH')

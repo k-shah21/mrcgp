@@ -48,19 +48,22 @@
                 @php
                     $navItems = [
                         [
-                            'label' => 'Dashboard',
-                            'icon' => 'ri-dashboard-3-line',
-                            'route' => 'admin.dashboard',
-                        ],
-                        [
                             'label' => 'Applications',
                             'icon' => 'ri-file-list-3-line',
-                            'route' => 'admin.applications.index',
+                            'route' =>
+                                auth()->check() && auth()->user()->isAdmin()
+                                    ? 'admin.applications.index'
+                                    : 'user.applications.index',
                         ],
                     ];
 
                     // Admin-only nav items
                     if (auth()->check() && auth()->user()->isAdmin()) {
+                        array_unshift($navItems, [
+                            'label' => 'Dashboard',
+                            'icon' => 'ri-dashboard-3-line',
+                            'route' => 'admin.dashboard',
+                        ]);
                         $navItems[] = [
                             'label' => 'Staff',
                             'icon' => 'ri-team-line',

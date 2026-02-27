@@ -1,8 +1,10 @@
 <x-layouts.dashboard title="Applications" description="Candidate application management">
+    @php $routePrefix = auth()->check() && auth()->user()->isAdmin() ? 'admin.' : 'user.'; @endphp
 
     {{-- Filters --}}
     <x-card title="All Applications" subtitle="Search and filter candidates">
-        <form action="{{ route('admin.applications.index') }}" method="GET" class="flex flex-wrap items-end gap-3 mb-4">
+        <form action="{{ route($routePrefix . 'applications.index') }}" method="GET"
+            class="flex flex-wrap items-end gap-3 mb-4">
             <div class="flex-1 min-w-[200px]">
                 <label class="block text-[11px] font-semibold uppercase tracking-wide text-slate-500 mb-1">Search</label>
                 <input type="text" name="search" value="{{ $search }}"
@@ -53,7 +55,7 @@
                 <i class="ri-filter-3-line text-sm"></i> Filter
             </button>
             @if (request()->hasAny(['search', 'status', 'type', 'handled_by']))
-                <a href="{{ route('admin.applications.index') }}"
+                <a href="{{ route($routePrefix . 'applications.index') }}"
                     class="px-4 py-2 text-xs font-medium text-slate-500 hover:text-slate-700 transition">
                     Clear
                 </a>
@@ -80,9 +82,11 @@
                         <th
                             class="border-b border-slate-100 bg-slate-50/80 text-[11px] uppercase tracking-[0.16em] text-slate-500 font-semibold px-4 py-3">
                             Status</th>
-                        <th
-                            class="border-b border-slate-100 bg-slate-50/80 text-[11px] uppercase tracking-[0.16em] text-slate-500 font-semibold px-4 py-3">
-                            Handled By</th>
+                        @if (auth()->check() && auth()->user()->isAdmin())
+                            <th
+                                class="border-b border-slate-100 bg-slate-50/80 text-[11px] uppercase tracking-[0.16em] text-slate-500 font-semibold px-4 py-3">
+                                Handled By</th>
+                        @endif
                         <th
                             class="border-b border-slate-100 bg-slate-50/80 text-[11px] uppercase tracking-[0.16em] text-slate-500 font-semibold px-4 py-3">
                             Date</th>
@@ -120,14 +124,16 @@
                                     {{ ucfirst($app->status ?? 'pending') }}
                                 </x-badge>
                             </td>
-                            <td class="border-b border-slate-100 px-4 py-3 text-xs text-slate-500">
-                                {{ $app->handledBy?->name ?? '—' }}
-                            </td>
+                            @if (auth()->check() && auth()->user()->isAdmin())
+                                <td class="border-b border-slate-100 px-4 py-3 text-xs text-slate-500">
+                                    {{ $app->handledBy?->name ?? '—' }}
+                                </td>
+                            @endif
                             <td class="border-b border-slate-100 px-4 py-3 text-xs text-slate-500">
                                 {{ $app->created_at?->format('M d, Y') }}
                             </td>
                             <td class="border-b border-slate-100 px-4 py-3">
-                                <a href="{{ route('admin.applications.show', $app) }}"
+                                <a href="{{ route($routePrefix . 'applications.show', $app) }}"
                                     class="inline-flex items-center gap-1 rounded-lg bg-slate-100 px-3 py-1.5 text-[11px] font-medium text-slate-700 hover:bg-slate-200 transition">
                                     <i class="ri-eye-line text-sm"></i> View
                                 </a>
@@ -135,7 +141,8 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="px-4 py-8 text-center text-xs text-slate-400">
+                            <td colspan="{{ auth()->check() && auth()->user()->isAdmin() ? 8 : 7 }}"
+                                class="px-4 py-8 text-center text-xs text-slate-400">
                                 No applications found.
                             </td>
                         </tr>

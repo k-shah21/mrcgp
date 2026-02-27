@@ -6,7 +6,7 @@ use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Route; 
+use Illuminate\Support\Facades\Route;
 
 
 Route::get('/', function () {
@@ -14,7 +14,7 @@ Route::get('/', function () {
 });
 
 Route::get('/test/mail', function () {
-    Mail::raw('MailHog test', fn ($m) => $m->to('test@test.com')->subject('Test'));
+    Mail::raw('MailHog test', fn($m) => $m->to('test@test.com')->subject('Test'));
 });
 
 // ------------- public application endpoints --------------------------------------
@@ -38,31 +38,53 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // routes that require a logged-in admin/staff (session flag checked by admin.auth alias)
     Route::middleware(['auth', 'admin.auth'])->group(function () {
-        // entry point / dashboard -- render dashboard with stats
-        Route::get('dashboard', [ApplicationController::class, 'dashboard'])
-            ->name('dashboard');
 
-        // applications resource-like endpoints used by the admin UI
+        $applicationRoutes = function () {
+            Route::get('applications', [ApplicationController::class, 'adminIndex'])
+                ->name('applications.index');
+            Route::get('applications/{application}', [ApplicationController::class, 'adminShow'])
+                ->name('applications.show');
+            Route::patch('applications/{application}/status', [ApplicationController::class, 'updateStatus'])
+                ->name('applications.update-status');
+        };
+
+        // Admin Only Routes
+        Route::middleware('role:admin')->group(function () use ($applicationRoutes) {
+            // entry point / dashboard -- render dashboard with stats
+            Route::get('dashboard', [ApplicationController::class, 'dashboard'])
+                ->name('dashboard');
+
+            // applications resource-like endpoints used by the admin UI
+            $applicationRoutes();
+
+            // ── Staff Management (Admin Only) ──────────────────────
+            Route::prefix('staff')->name('staff.')->group(function () {
+                Route::get('/', [StaffController::class, 'index'])->name('index');
+                Route::get('/create', [StaffController::class, 'create'])->name('create');
+                Route::post('/', [StaffController::class, 'store'])->name('store');
+                Route::patch('/{user}/toggle-status', [StaffController::class, 'toggleStatus'])->name('toggle-status');
+                Route::post('/{user}/resend-invite', [StaffController::class, 'resendInvite'])->name('resend-invite');
+            });
+        });
+
+        // Logout applies to both authenticated dashboard users
+        Route::post('logout', [AdminAuthController::class, 'logout'])
+            ->name('logout');
+    });
+});
+
+// Staff (User) Application Routes
+Route::middleware(['auth', 'admin.auth', 'role:staff'])
+    ->prefix('user')
+    ->name('user.')
+    ->group(function () {
         Route::get('applications', [ApplicationController::class, 'adminIndex'])
             ->name('applications.index');
         Route::get('applications/{application}', [ApplicationController::class, 'adminShow'])
             ->name('applications.show');
         Route::patch('applications/{application}/status', [ApplicationController::class, 'updateStatus'])
             ->name('applications.update-status');
-
-        // ── Staff Management (Admin Only) ──────────────────────
-        Route::middleware('role:admin')->prefix('staff')->name('staff.')->group(function () {
-            Route::get('/', [StaffController::class, 'index'])->name('index');
-            Route::get('/create', [StaffController::class, 'create'])->name('create');
-            Route::post('/', [StaffController::class, 'store'])->name('store');
-            Route::patch('/{user}/toggle-status', [StaffController::class, 'toggleStatus'])->name('toggle-status');
-            Route::post('/{user}/resend-invite', [StaffController::class, 'resendInvite'])->name('resend-invite');
-        });
-
-        Route::post('logout', [AdminAuthController::class, 'logout'])
-            ->name('logout');
     });
-});
 
 
 
