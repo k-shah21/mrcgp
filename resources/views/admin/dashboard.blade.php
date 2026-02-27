@@ -16,87 +16,98 @@
         </x-card>
     </div>
 
-    {{-- Charts --}}
-    <div class="flex flex-col lg:flex-row gap-6 mb-6">
-        <div class="w-full lg:w-3/5">
+    {{-- Charts Row --}}
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-6">
+        {{-- Registrations Over Time --}}
+        <div class="w-full">
             <x-card title="Registrations Over Time" subtitle="Last 30 days">
-                <div id="registrationsTimeChart" class="h-72"></div>
+                <div id="registrationsTimeChart" class="h-80"></div>
             </x-card>
         </div>
-        <div class="w-full lg:w-2/5">
+
+        {{-- Application Status Distribution --}}
+        <div class="w-full">
             <x-card title="Application Status" subtitle="Distribution">
-                <div id="statusDonutChart" class="h-72"></div>
-            </x-card>
-        </div>
-    </div>
-
-    {{-- Top 5 Applications & Handled By Chart --}}
-    <div class="flex flex-col lg:flex-row gap-6 mb-6">
-        {{-- Top 5 Pending Applications --}}
-        <div class="w-full lg:w-1/2">
-            <x-card title="Top 5 Pending Applications" subtitle="Most recent pending reviews">
-                @if ($topApplications->count())
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full text-left text-xs text-slate-600">
-                            <thead>
-                                <tr>
-                                    <th
-                                        class="border-b border-slate-100 bg-slate-50/80 text-[11px] uppercase tracking-[0.16em] text-slate-500 font-semibold px-4 py-2.5">
-                                        Name</th>
-                                    <th
-                                        class="border-b border-slate-100 bg-slate-50/80 text-[11px] uppercase tracking-[0.16em] text-slate-500 font-semibold px-4 py-2.5">
-                                        Type</th>
-                                    <th
-                                        class="border-b border-slate-100 bg-slate-50/80 text-[11px] uppercase tracking-[0.16em] text-slate-500 font-semibold px-4 py-2.5">
-                                        Submitted</th>
-                                    <th
-                                        class="border-b border-slate-100 bg-slate-50/80 text-[11px] uppercase tracking-[0.16em] text-slate-500 font-semibold px-4 py-2.5">
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($topApplications as $app)
-                                    <tr class="hover:bg-slate-50/50 transition">
-                                        <td
-                                            class="border-b border-slate-100 px-4 py-2.5 text-xs text-slate-900 font-medium">
-                                            {{ $app->usualForename }} {{ $app->lastName }}
-                                        </td>
-                                        <td class="border-b border-slate-100 px-4 py-2.5">
-                                            <x-badge :variant="$app->candidateType === 'new' ? 'info' : 'neutral'">
-                                                {{ ucfirst($app->candidateType) }}
-                                            </x-badge>
-                                        </td>
-                                        <td class="border-b border-slate-100 px-4 py-2.5 text-xs text-slate-500">
-                                            {{ $app->created_at?->format('M d, Y') }}
-                                        </td>
-                                        <td class="border-b border-slate-100 px-4 py-2.5">
-                                            <a href="{{ route('admin.applications.show', $app) }}"
-                                                class="inline-flex items-center gap-1 rounded-lg bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-700 hover:bg-slate-200 transition">
-                                                <i class="ri-eye-line text-sm"></i> View
-                                            </a>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @else
-                    <div class="text-center py-6">
-                        <i class="ri-checkbox-circle-line text-3xl text-emerald-300"></i>
-                        <p class="text-xs text-slate-400 mt-2">No pending applications at this time.</p>
-                    </div>
-                @endif
+                <div id="statusDonutChart" class="h-80"></div>
             </x-card>
         </div>
 
-        {{-- Handled By Analytics Chart (Admin Only) --}}
-        @if (auth()->check() && auth()->user()->isAdmin() && count($handledByChart['labels']) > 0)
-            <div class="w-full lg:w-1/2">
-                <x-card title="Handled By Analytics" subtitle="Applications processed per user">
-                    <div id="handledByChart" class="h-72"></div>
+        {{-- Handled By Analytics (Admin Only) --}}
+        {{-- @if (auth()->check() && auth()->user()->isAdmin() && count($handledByChart['labels']) > 0) --}}
+            <div class="w-full">
+                <x-card title="Handled By Analytics" subtitle="Processed per user">
+                    <div id="handledByChart" class="h-80"></div>
                 </x-card>
             </div>
-        @endif
+        {{-- @endif --}}
+    </div>
+
+    {{-- Top 5 Recent Pending Applications - Full Width --}}
+    <div class="mb-6">
+        <x-card title="Top 5 Pending Applications" subtitle="Requiring immediate review">
+            @if ($topApplications->count())
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-left text-xs text-slate-600">
+                        <thead>
+                            <tr>
+                                <th
+                                    class="border-b border-slate-100 bg-slate-50/80 text-[11px] uppercase tracking-[0.16em] text-slate-500 font-semibold px-6 py-3.5">
+                                    Name</th>
+                                <th
+                                    class="border-b border-slate-100 bg-slate-50/80 text-[11px] uppercase tracking-[0.16em] text-slate-500 font-semibold px-6 py-3.5">
+                                    Email</th>
+                                <th
+                                    class="border-b border-slate-100 bg-slate-50/80 text-[11px] uppercase tracking-[0.16em] text-slate-500 font-semibold px-6 py-3.5">
+                                    Type</th>
+                                <th
+                                    class="border-b border-slate-100 bg-slate-50/80 text-[11px] uppercase tracking-[0.16em] text-slate-500 font-semibold px-6 py-3.5">
+                                    Submitted</th>
+                                <th
+                                    class="border-b border-slate-100 bg-slate-50/80 text-[11px] uppercase tracking-[0.16em] text-slate-500 font-semibold px-6 py-3.5">
+                                    Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-50">
+                            @foreach ($topApplications as $app)
+                                <tr class="hover:bg-slate-50/50 transition duration-200">
+                                    <td class="px-6 py-4 text-xs text-slate-900 font-medium">
+                                        {{ $app->usualForename }} {{ $app->lastName }}
+                                    </td>
+                                    <td class="px-6 py-4 text-xs text-slate-500">
+                                        {{ $app->email ?? '—' }}
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <x-badge :variant="$app->candidateType === 'new' ? 'info' : 'neutral'">
+                                            {{ ucfirst($app->candidateType) }}
+                                        </x-badge>
+                                    </td>
+                                    <td class="px-6 py-4 text-xs text-slate-500">
+                                        {{ $app->created_at?->format('M d, Y') }}
+                                        <span
+                                            class="block text-[10px] text-slate-400 mt-0.5">{{ $app->created_at?->diffForHumans() }}</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <a href="{{ route('admin.applications.show', $app) }}"
+                                            class="inline-flex items-center gap-1.5 rounded-lg bg-indigo-50 px-3 py-1.5 text-[11px] font-semibold text-indigo-600 hover:bg-indigo-100 transition duration-200 shadow-sm">
+                                            <i class="ri-eye-line text-sm"></i> Review
+                                        </a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @else
+                <div class="text-center py-12">
+                    <div
+                        class="mx-auto w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center mb-4">
+                        <i class="ri-checkbox-circle-line text-2xl"></i>
+                    </div>
+                    <p class="text-sm font-medium text-slate-600">All caught up!</p>
+                    <p class="text-xs text-slate-400 mt-1">There are no pending applications awaiting review.</p>
+                </div>
+            @endif
+        </x-card>
     </div>
 
     @push('scripts')
@@ -109,27 +120,30 @@
                 new ApexCharts(document.querySelector("#registrationsTimeChart"), {
                     chart: {
                         type: 'area',
-                        height: 300,
+                        height: 320,
                         toolbar: {
                             show: false
                         },
-                        foreColor: '#9ca3af'
+                        parentHeightOffset: 0,
+                        foreColor: '#94a3b8'
                     },
                     colors: ['#6366f1'],
                     stroke: {
                         curve: 'smooth',
-                        width: 2
+                        width: 2.5
                     },
                     fill: {
                         type: 'gradient',
                         gradient: {
                             shadeIntensity: 1,
-                            opacityFrom: 0.45,
-                            opacityTo: 0.05
+                            opacityFrom: 0.4,
+                            opacityTo: 0.05,
+                            stops: [0, 90, 100]
                         }
                     },
                     grid: {
-                        borderColor: '#e5e7eb'
+                        borderColor: '#f1f5f9',
+                        strokeDashArray: 4
                     },
                     series: [{
                         name: 'Applications',
@@ -137,22 +151,34 @@
                     }],
                     xaxis: {
                         categories: timeDates,
+                        axisBorder: {
+                            show: false
+                        },
+                        axisTicks: {
+                            show: false
+                        },
                         labels: {
                             style: {
-                                colors: '#9ca3af',
-                                fontSize: '10px'
+                                colors: '#94a3b8',
+                                fontSize: '10px',
+                                fontWeight: 500
                             }
                         }
                     },
                     yaxis: {
                         labels: {
                             style: {
-                                colors: '#9ca3af'
+                                colors: '#94a3b8',
+                                fontSize: '10px',
+                                fontWeight: 500
                             }
                         }
                     },
                     tooltip: {
-                        theme: 'light'
+                        theme: 'light',
+                        x: {
+                            show: false
+                        }
                     },
                     dataLabels: {
                         enabled: false
@@ -163,24 +189,48 @@
                 new ApexCharts(document.querySelector("#statusDonutChart"), {
                     chart: {
                         type: 'donut',
-                        height: 300,
+                        height: 320,
                         toolbar: {
                             show: false
                         },
-                        foreColor: '#9ca3af'
+                        foreColor: '#94a3b8'
+                    },
+                    stroke: {
+                        width: 0
                     },
                     colors: {!! json_encode($statusChartData['colors']) !!},
                     labels: {!! json_encode($statusChartData['labels']) !!},
                     series: {!! json_encode($statusChartData['series']) !!},
                     legend: {
-                        position: 'bottom'
+                        position: 'bottom',
+                        fontSize: '11px',
+                        fontWeight: 500,
+                        markers: {
+                            radius: 12
+                        }
                     },
                     plotOptions: {
                         pie: {
                             donut: {
-                                size: '65%'
+                                size: '75%',
+                                labels: {
+                                    show: true,
+                                    total: {
+                                        show: true,
+                                        label: 'Total',
+                                        fontSize: '12px',
+                                        fontWeight: 600,
+                                        color: '#64748b',
+                                        formatter: function(w) {
+                                            return w.globals.seriesTotals.reduce((a, b) => a + b, 0)
+                                        }
+                                    }
+                                }
                             }
                         }
+                    },
+                    dataLabels: {
+                        enabled: false
                     },
                 }).render();
 
@@ -190,12 +240,12 @@
                     new ApexCharts(handledEl, {
                         chart: {
                             type: 'bar',
-                            height: 300,
+                            height: 320,
                             stacked: true,
                             toolbar: {
                                 show: false
                             },
-                            foreColor: '#9ca3af'
+                            foreColor: '#94a3b8'
                         },
                         colors: ['#10b981', '#ef4444'],
                         series: [{
@@ -209,37 +259,45 @@
                         ],
                         xaxis: {
                             categories: {!! json_encode($handledByChart['labels']) !!},
+                            axisBorder: {
+                                show: false
+                            },
+                            axisTicks: {
+                                show: false
+                            },
                             labels: {
                                 style: {
-                                    colors: '#9ca3af',
-                                    fontSize: '10px'
+                                    colors: '#94a3b8',
+                                    fontSize: '10px',
+                                    fontWeight: 500
                                 }
                             }
                         },
                         yaxis: {
                             labels: {
                                 style: {
-                                    colors: '#9ca3af'
-                                }
-                            },
-                            title: {
-                                text: 'Applications',
-                                style: {
-                                    color: '#9ca3af',
-                                    fontSize: '11px'
+                                    colors: '#94a3b8',
+                                    fontSize: '10px',
+                                    fontWeight: 500
                                 }
                             }
                         },
                         grid: {
-                            borderColor: '#e5e7eb'
+                            borderColor: '#f1f5f9',
+                            strokeDashArray: 4
                         },
                         legend: {
-                            position: 'top'
+                            position: 'bottom',
+                            fontSize: '11px',
+                            fontWeight: 500,
+                            markers: {
+                                radius: 12
+                            }
                         },
                         plotOptions: {
                             bar: {
-                                borderRadius: 4,
-                                columnWidth: '50%'
+                                borderRadius: 6,
+                                columnWidth: '40%'
                             }
                         },
                         dataLabels: {
