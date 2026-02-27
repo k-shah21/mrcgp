@@ -21,7 +21,13 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\CheckRole::class,
         ]);
 
-        $middleware->redirectUsersTo(fn() => route('admin.dashboard'));
+        $middleware->redirectUsersTo(function (Request $request) {
+            $user = $request->user();
+            if ($user && $user->role === 'staff') {
+                return route('admin.applications.index');
+            }
+            return route('admin.dashboard');
+        });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
 

@@ -33,7 +33,10 @@ class AuthenticatedSessionController extends Controller
             'admin_email' => $request->user()->email,
         ]);
 
-        return redirect()->intended(route('admin.dashboard', absolute: false));
+        $user = $request->user();
+        $redirectRoute = $user->role === 'staff' ? 'admin.applications.index' : 'admin.dashboard';
+
+        return redirect()->intended(route($redirectRoute, absolute: false));
     }
 
     /**

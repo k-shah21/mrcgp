@@ -38,6 +38,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // routes that require a logged-in admin/staff (session flag checked by admin.auth alias)
     Route::middleware(['auth', 'admin.auth'])->group(function () {
+        // Admin only dashboard
+        Route::middleware('role:admin')->group(function () {
+            Route::get('dashboard', [ApplicationController::class, 'dashboard'])
+                ->name('dashboard');
+        });
 
         $applicationRoutes = function () {
             Route::get('applications', [ApplicationController::class, 'adminIndex'])
