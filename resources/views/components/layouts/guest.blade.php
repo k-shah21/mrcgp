@@ -6,6 +6,7 @@
     <title>{{ $title ?? 'MRCGP Portal' }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.1.0/fonts/remixicon.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body { font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; }
         .gradient-bg { background: radial-gradient(circle at top right, #eef2ff 0%, #f8fafc 100%); }

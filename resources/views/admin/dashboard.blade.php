@@ -20,7 +20,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-6">
         {{-- Registrations Over Time --}}
         <div class="w-full">
-            <x-card title="Applications Over Time" subtitle="7 days">
+            <x-card title="Applications Over Time" subtitle="All-time">
                 <div id="registrationsTimeChart" class="h-80"></div>
             </x-card>
         </div>
