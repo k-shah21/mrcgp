@@ -44,13 +44,24 @@ class Application extends Model
         'otherDocumentsPaths',
         'status',
         'rejection_reason',
+        'handled_by_user_id',
+        'handled_action',
+        'handled_at',
     ];
 
     protected $casts = [
         'termsAccepted' => 'boolean',
         'registrationDate' => 'date',
         'otherDocumentsPaths' => 'array',
+        'handled_at' => 'datetime',
     ];
+
+    // ─── Relationships ─────────────────────────────
+
+    public function handledBy()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'handled_by_user_id');
+    }
 
     // ─── Scopes ─────────────────────────────────────
 
@@ -87,9 +98,9 @@ class Application extends Model
 
         return $query->where(function ($q) use ($search) {
             $q->where('usualForename', 'like', "%{$search}%")
-              ->orWhere('lastName', 'like', "%{$search}%")
+                ->orWhere('lastName', 'like', "%{$search}%")
                 ->orWhere('email', 'like', "%{$search}%")
-              ->orWhere('passportNumber', 'like', "%{$search}%");
+                ->orWhere('passportNumber', 'like', "%{$search}%");
         });
     }
 

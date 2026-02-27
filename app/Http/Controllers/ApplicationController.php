@@ -289,10 +289,38 @@ class ApplicationController extends Controller
             'colors' => ['#f59e0b', '#10b981', '#ef4444'],
         ];
 
+        // Top 5 recent pending applications
+        $topApplications = Application::pending()
+            ->latest()
+            ->take(5)
+            ->get();
+
+        // Handled By analytics (admin only) – stacked bar chart data
+        $handledByChart = ['labels' => [], 'approved' => [], 'rejected' => []];
+        if (auth()->check() && auth()->user()->isAdmin()) {
+            $handledStats = \App\Models\User::withCount([
+                'handledApplications as approved_count' => function ($q) {
+                    $q->where('handled_action', 'approved');
+                },
+                'handledApplications as rejected_count' => function ($q) {
+                    $q->where('handled_action', 'rejected');
+                },
+            ])
+                ->having('approved_count', '>', 0)
+                ->orHaving('rejected_count', '>', 0)
+                ->get();
+
+            $handledByChart['labels'] = $handledStats->pluck('name')->toArray();
+            $handledByChart['approved'] = $handledStats->pluck('approved_count')->toArray();
+            $handledByChart['rejected'] = $handledStats->pluck('rejected_count')->toArray();
+        }
+
         return view('admin.dashboard', compact(
             'stats',
             'timeChartData',
-            'statusChartData'
+            'statusChartData',
+            'topApplications',
+            'handledByChart'
         ));
     }
 
@@ -304,20 +332,33 @@ class ApplicationController extends Controller
         $search = $request->input('search');
         $status = $request->input('status');
         $type = $request->input('type');
+        $handledBy = $request->input('handled_by');
 
-        $query = Application::query()
+        $query = Application::with('handledBy')
             ->search($search)
             ->when($status, fn($q, $s) => $q->where('status', $s))
             ->when($type, fn($q, $t) => $q->where('candidateType', $t))
+            ->when($handledBy, fn($q, $h) => $q->where('handled_by_user_id', $h))
             ->latest();
 
         $applications = $query->paginate(15)->withQueryString();
+
+        // Provide handlers list for admin filter dropdown
+        $handlers = collect();
+        if (auth()->check() && auth()->user()->isAdmin()) {
+            $handlers = \App\Models\User::select('id', 'name')
+                ->whereHas('handledApplications')
+                ->orderBy('name')
+                ->get();
+        }
 
         return view('admin.applications.index', compact(
             'applications',
             'search',
             'status',
-            'type'
+            'type',
+            'handledBy',
+            'handlers'
         ));
     }
 
@@ -345,6 +386,18 @@ class ApplicationController extends Controller
         ]);
 
         $updateData = ['status' => $request->status];
+
+        // Audit trail: record who handled this and when
+        if (in_array($request->status, ['approved', 'rejected'])) {
+            $updateData['handled_by_user_id'] = auth()->id();
+            $updateData['handled_action'] = $request->status;
+            $updateData['handled_at'] = now();
+        } else {
+            // When resetting to pending, clear audit trail
+            $updateData['handled_by_user_id'] = null;
+            $updateData['handled_action'] = null;
+            $updateData['handled_at'] = null;
+        }
 
         if ($request->status === 'rejected') {
             // Store rejection reason (optional)

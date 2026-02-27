@@ -21,7 +21,28 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'is_active',
     ];
+
+    // ─── Role Helpers ──────────────────────────────
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isStaff(): bool
+    {
+        return $this->role === 'staff';
+    }
+
+    // ─── Relationships ─────────────────────────────
+
+    public function handledApplications()
+    {
+        return $this->hasMany(\App\Models\Application::class, 'handled_by_user_id');
+    }
 
     /**
      * The attributes that should be hidden for serialization.
