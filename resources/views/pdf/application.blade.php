@@ -126,7 +126,7 @@
                 <td class="value">{{ $district ?? 'Not provided' }}</td>
             </tr>
             <tr>
-                <td class="label">City:</td>
+                <td class="label">City / Town / Village:</td>
                 <td class="value">{{ $city ?? 'Not provided' }}</td>
             </tr>
             <tr>
