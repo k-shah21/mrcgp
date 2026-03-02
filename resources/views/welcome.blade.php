@@ -906,7 +906,7 @@
                                                                 </label>
                                                             </div>
                                                             <p class="text-xs text-slate-500 mt-2" id="sig-upload-hint">
-                                                                JPG, JPEG, PNG (MAX. 3MB)</p>
+                                                                JPG, JPEG, PNG, PDF (MAX. 3MB)</p>
                                                         </div>
                                                     </div>
                                                 </div>

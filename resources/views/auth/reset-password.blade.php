@@ -75,6 +75,10 @@
                         placeholder="••••••••"
                         class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none"
                     >
+                      <button type="button" id="toggle-pw"
+                        class="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600 transition">
+                        <i class="ri-eye-line text-lg" id="eye-icon"></i>
+                    </button>
                 </div>
             </div>
 
@@ -95,6 +99,10 @@
                         placeholder="••••••••"
                         class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none"
                     >
+                    <button type="button" id="toggle-pw-confirm"
+                        class="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600 transition">
+                        <i class="ri-eye-line text-lg" id="eye-icon-confirm"></i>
+                    </button>
                 </div>
             </div>
 
@@ -115,5 +123,29 @@
         </form>
     </div>
 
+ <script>
+        document.getElementById('toggle-pw')?.addEventListener('click', function () {
+            const pw = document.getElementById('password');
+            const icon = document.getElementById('eye-icon');
+            if (pw.type === 'password') {
+                pw.type = 'text';
+                icon.className = 'ri-eye-off-line text-lg';
+            } else {
+                pw.type = 'password';
+                icon.className = 'ri-eye-line text-lg';
+            }
+        });
 
+        document.getElementById('toggle-pw-confirm')?.addEventListener('click', function () {
+            const pw = document.getElementById('password_confirmation');
+            const icon = document.getElementById('eye-icon-confirm');
+            if (pw.type === 'password') {
+                pw.type = 'text';
+                icon.className = 'ri-eye-off-line text-lg';
+            } else {
+                pw.type = 'password';
+                icon.className = 'ri-eye-line text-lg';
+            }
+        });
+    </script>
 </x-layouts.guest>
