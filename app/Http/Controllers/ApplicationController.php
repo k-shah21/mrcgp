@@ -43,7 +43,6 @@ class ApplicationController extends Controller
         $candidateId = trim($request->candidate_id);
 
         $application = Application::where('candidateId', $candidateId)
-            ->orWhere('passportNumber', $candidateId)
             ->first();
 
         if ($application) {
@@ -53,15 +52,14 @@ class ApplicationController extends Controller
         }
 
         $oldCandidate = OldCandidate::where('candidate_id', $candidateId)
-            ->orWhere('passportNumber', $candidateId)
             ->first();
 
         if ($oldCandidate) {
-            $name = trim($oldCandidate->usualForename . ' ' . $oldCandidate->lastName);
+            $name = trim($oldCandidate->name);
             return back()->with('success', "Candidate found in historical records. Name: {$name}. No active application exists.");
         }
 
-        return back()->with('error', "No candidate found with the provided ID or Passport Number. Please check the ID and try again.");
+        return back()->with('error', "No candidate found with the provided ID. Please check the ID and try again.");
     }
 
     /**
