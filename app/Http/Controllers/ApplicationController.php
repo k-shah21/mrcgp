@@ -186,7 +186,8 @@ class ApplicationController extends Controller
             if ($request->hasFile('experience_certificates')) {
                 $paths = [];
                 foreach ($request->file('experience_certificates') as $file) {
-                    $paths[] = $file->store('documents/experience', 'public');
+                    $stored = $file->store('documents/experience', 'public');
+                    if (!in_array($stored, $paths)) $paths[] = $stored;
                 }
                 $data['experienceCertificatePath'] = json_encode($paths);
             }

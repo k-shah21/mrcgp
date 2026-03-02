@@ -1039,7 +1039,7 @@
                                                             JPEG, PNG (MAX. 3MB), PDF (MAX. 5MB)</p>
                                                     </div><input id="internship-certificate-new-0" type="file"
                                                         class="hidden" accept=".png, .jpg, .jpeg, .pdf"
-                                                        name="internship_certificates[]">
+                                                        name="internship_certificates[]" multiple>
                                                 </label>
                                             </div>
                                             <div class="space-y-2" data-doc="training">
@@ -1102,7 +1102,7 @@
                                                             JPEG, PNG (MAX. 3MB), PDF (MAX. 5MB)</p>
                                                     </div>
                                                     <input id="experience-certificate-new-0" type="file" class="hidden"
-                                                        accept=".png, .jpg, .jpeg, .pdf" name="experience_certificates[]">
+                                                        accept=".png, .jpg, .jpeg, .pdf" name="experience_certificates[]" multiple>
                                                 </label>
                                             </div>
                                         </div>
@@ -1573,6 +1573,7 @@
                                             e.preventDefault();
                                             e.stopPropagation();
                                             self.removeFile(f);
+                                            input.value = null;
                                             dzDiv.click(); // Standard way to trigger dropzone picker
                                         };
                                     }
@@ -2489,7 +2490,7 @@
                     formData.delete(name);
                     
                     // Add files from Dropzone
-                    dz.getQueuedFiles().concat(dz.getAcceptedFiles()).forEach(file => {
+                    dz.getAcceptedFiles().forEach(file => {
                         formData.append(name, file);
                     });
                 });
