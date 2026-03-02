@@ -418,7 +418,7 @@
                                                         <p class="text-xs text-slate-500">JPG, JPEG, PNG (MAX.
                                                             5MB)</p>
                                                     </div>
-                                                    <input id="passport-image" name="passportImage" type="file"
+                                                    <input id="passport-image" name="passport_Image" type="file"
                                                         class="hidden" accept=".png, .jpg, .jpeg, .pdf">
                                                 </label>
                                             </div>
@@ -902,7 +902,7 @@
                                                                     </div>
                                                                     <input id="signature-upload" type="file"
                                                                         class="hidden" accept=".png, .jpg, .jpeg, .pdf"
-                                                                        name="signatureUpload">
+                                                                        name="signature_Upload">
                                                                 </label>
                                                             </div>
                                                             <p class="text-xs text-slate-500 mt-2" id="sig-upload-hint">

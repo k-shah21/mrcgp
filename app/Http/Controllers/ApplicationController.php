@@ -149,22 +149,22 @@ class ApplicationController extends Controller
         $data = $request->except([
             '_token',
             'duplicateDisclaimer',
-            'passportImage',
+            'passport_Image',
             'passport_bio_page',
             'valid_license',
             'mbbs_degree',
             'training_certificate',
             'internship_certificates',
             'experience_certificates',
-            'signatureUpload',
+            'signature_Upload',
         ]);
 
         DB::beginTransaction();
 
         try {
             // ── File uploads ────────────────────────────────
-            if ($request->hasFile('passportImage')) {
-                $data['passportImagePath'] = $request->file('passportImage')->store('documents/passports', 'public');
+            if ($request->hasFile('passport_Image')) {
+                $data['passportImagePath'] = $request->file('passport_Image')->store('documents/passports', 'public');
             }
 
             if ($request->hasFile('passport_bio_page')) {
@@ -176,8 +176,8 @@ class ApplicationController extends Controller
             }
 
             // ── Signature ───────────────────────────────────
-            if ($request->hasFile('signatureUpload')) {
-                $data['signature'] = $request->file('signatureUpload')->store('documents/signatures', 'public');
+            if ($request->hasFile('signature_Upload')) {
+                $data['signature'] = $request->file('signature_Upload')->store('documents/signatures', 'public');
             } elseif ($request->filled('signature')) {
                 $data['signature'] = $request->signature; // base64
             }

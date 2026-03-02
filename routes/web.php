@@ -20,10 +20,19 @@ Route::get('/test/mail', function () {
 // ------------- public application endpoints --------------------------------------
 Route::post('/check-eligibility', [ApplicationController::class, 'checkEligibility'])
     ->name('application.check-eligibility');
+Route::get('/check-eligibility', function () {
+    return redirect('/');
+});
 Route::post('/apply', [ApplicationController::class, 'store'])
     ->name('application.store');
+Route::get('/apply', function () {
+    return redirect('/');
+});
 Route::post('/preview-application', [ApplicationController::class, 'preview'])
     ->name('application.preview');
+Route::get('/preview-application', function () {
+    return redirect('/');
+});
 Route::get('/check-candidate', [ApplicationController::class, 'showCheckCandidateForm'])
     ->name('candidate.check.form');
 Route::post('/check-candidate', [ApplicationController::class, 'checkCandidateStatus'])

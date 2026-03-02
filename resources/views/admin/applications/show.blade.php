@@ -179,8 +179,7 @@
 
                     @if ($application->passportImagePath)
                         <div class="border border-slate-200 rounded-xl p-3">
-                            <p class="text-[11px] uppercase tracking-wide text-slate-400 font-semibold mb-2">Passport
-                                Image</p>
+                            <p class="text-[11px] uppercase tracking-wide text-slate-400 font-semibold mb-2">Passport Image</p>
                             @if ($isImage($application->passportImagePath))
                                 <div class="relative group cursor-pointer"
                                     onclick="openLightbox('{{ asset('storage/' . $application->passportImagePath) }}')">
@@ -252,8 +251,7 @@
 
                     @if ($application->signature)
                         <div class="border border-slate-200 rounded-xl p-3">
-                            <p class="text-[11px] uppercase tracking-wide text-slate-400 font-semibold mb-2">Signature
-                            </p>
+                            <p class="text-[11px] uppercase tracking-wide text-slate-400 font-semibold mb-2">Signature</p>
                             @if (Str::startsWith($application->signature, 'data:'))
                                 <div class="relative group cursor-pointer"
                                     onclick="openLightbox('{{ $application->signature }}')">
@@ -292,7 +290,7 @@
                         @foreach ($otherDocs as $docType => $path)
                             <div class="border border-slate-200 rounded-xl p-3">
                                 <p class="text-[11px] uppercase tracking-wide text-slate-400 font-semibold mb-2">
-                                    {{ str_replace('_', ' ', ucfirst($docType)) }}</p>
+                                    {{ str_replace(['passport_Image', 'signature_Upload', '_'], ['Passport Image', 'Signature Upload', ' '], ucfirst($docType)) }}</p>
                                 @if (is_array($path))
                                     @foreach ($path as $i => $p)
                                         @if ($isImage($p))

@@ -268,7 +268,7 @@
         @foreach($images as $img)
             <div style="width:100%; text-align:center; margin-bottom:40px;">
                 <div style="font-weight:bold; font-size:18px; margin-bottom:20px; text-transform:uppercase; color: #4338ca;">
-                    {{ str_replace('_', ' ', $fieldName) }} 
+                    {{ str_replace(['passport_Image', 'signature_Upload', '_'], ['PASSPORT IMAGE', 'SIGNATURE UPLOAD', ' '], $fieldName) }} 
                     @if(count($files) > 1) (IMAGE) @endif
                 </div>
                 <div style="display: inline-block; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; background: #ffffff;">
@@ -284,7 +284,7 @@
         @if(count($nonImages) > 0)
             <div style="width:100%; text-align:center; margin-bottom:40px;">
                 <div style="font-weight:bold; font-size:18px; margin-bottom:20px; text-transform:uppercase; color: #4338ca;">
-                    {{ str_replace('_', ' ', $fieldName) }} (DOCUMENTS)
+                    {{ str_replace(['passport_Image', 'signature_Upload', '_'], ['PASSPORT IMAGE', 'SIGNATURE UPLOAD', ' '], $fieldName) }} (DOCUMENTS)
                 </div>
 
                 <div style="width:70%; margin:0 auto; padding:30px; border:2px dashed #e2e8f0; background:#f8fafc; border-radius:10px; text-align:left;">

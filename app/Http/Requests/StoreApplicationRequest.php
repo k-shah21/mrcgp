@@ -47,14 +47,14 @@ class StoreApplicationRequest extends FormRequest
             $rules['registrationNumber']           = 'required|string|max:255';
             $rules['registrationDate']             = 'required|date';
             $rules['eligibilityCriterion']         = 'required|string|in:A,B,C';
-            $rules['passportImage']                = 'required|image|mimes:jpeg,png,jpg|max:5120';
+            $rules['passport_Image']                = 'required|image|mimes:jpeg,png,jpg|max:5120';
             $rules['mbbs_degree']                  = 'required|file|mimes:jpeg,png,jpg,pdf|max:5120';
             $rules['internship_certificates']      = 'required|array|min:1';
             $rules['internship_certificates.*']    = 'file|mimes:jpeg,png,jpg,pdf|max:5120';
 
             // Signature validation
-            $rules['signature']                    = 'required_without:signatureUpload|string|nullable';
-            $rules['signatureUpload']              = 'required_without:signature|file|mimes:jpeg,png,jpg|max:3072|nullable';
+            $rules['signature']                    = 'required_without:signature_Upload|string|nullable';
+            $rules['signature_Upload']              = 'required_without:signature|file|mimes:jpeg,png,jpg|max:3072|nullable';
 
             // Conditional on eligibility criterion
             $elig = $this->input('eligibilityCriterion');
@@ -88,10 +88,10 @@ class StoreApplicationRequest extends FormRequest
             'eligibilityCriterion.in' => 'The selected Eligibility Criterion is not recognized. Please choose a valid option (A, B, or C).',
 
             // File validations
-            'passportImage.required' => 'A clear Passport Size Photograph is mandatory for your application profile. Please upload a profile image file.',
-            'passportImage.image' => 'The uploaded file for the Passport Image must be a valid image format (e.g., jpeg, png, jpg).',
-            'passportImage.mimes' => 'The Passport Image must be a file of type: jpeg, png, jpg.',
-            'passportImage.max' => 'The Passport Image file size must not exceed 5MB. Please compress the image and try again.',
+            'passport_Image.required' => 'A clear Passport Size Photograph is mandatory for your application profile. Please upload a profile image file.',
+            'passport_Image.image' => 'The uploaded file for the Passport Image must be a valid image format (e.g., jpeg, png, jpg).',
+            'passport_Image.mimes' => 'The Passport Image must be a file of type: jpeg, png, jpg.',
+            'passport_Image.max' => 'The Passport Image file size must not exceed 5MB. Please compress the image and try again.',
 
             'passport_bio_page.required' => 'The Bio-data Page of your Passport is required to verify your identity. Please ensure you upload a clear, legible copy.',
             'passport_bio_page.mimes' => 'The Passport Bio-data Page must be a file of type: jpeg, png, jpg, pdf.',
@@ -127,9 +127,9 @@ class StoreApplicationRequest extends FormRequest
             'schoolName.required' => 'The name of your Medical School is required to verify your educational background.',
             'qualificationYear.numeric' => 'The Qualification Year must be a valid numeric year.',
             'signature.required_without' => 'Please provide your signature by drawing it or uploading an image.',
-            'signatureUpload.required_without' => 'Please provide your signature by drawing it or uploading an image.',
-            'signatureUpload.mimes' => 'The uploaded signature must be an image (jpeg, png, jpg).',
-            'signatureUpload.max' => 'The signature image size must not exceed 3MB.',
+            'signature_Upload.required_without' => 'Please provide your signature by drawing it or uploading an image.',
+            'signature_Upload.mimes' => 'The uploaded signature must be an image (jpeg, png, jpg).',
+            'signature_Upload.max' => 'The signature image size must not exceed 3MB.',
         ];
     }
 }
